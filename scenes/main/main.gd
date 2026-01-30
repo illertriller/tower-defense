@@ -58,12 +58,20 @@ func _select_tower(type: String):
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT and is_placing:
-			_place_tower(event.position)
+			_place_tower(get_global_mouse_position())
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			is_placing = false
 			selected_tower = ""
 
+func _input(event: InputEvent):
+	# Show cursor feedback when placing
+	if is_placing and event is InputEventMouseMotion:
+		# Could add ghost tower preview here later
+		pass
+
 func _place_tower(pos: Vector2):
+	if selected_tower.is_empty():
+		return
 	if not GameManager.buy_tower(selected_tower):
 		return
 	var tower = tower_scene.instantiate()
