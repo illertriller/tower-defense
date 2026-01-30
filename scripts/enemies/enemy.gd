@@ -84,8 +84,7 @@ func _setup_animation():
 	animated_sprite.sprite_frames = frames
 	animated_sprite.play("walk")
 
-var facing_right: bool = true
-var was_moving_horizontal: bool = true
+var last_h_facing_right: bool = true
 
 func _process(delta: float):
 	# Handle slow effect
@@ -103,20 +102,14 @@ func _process(delta: float):
 		
 		# Determine facing direction
 		var move_dir = new_pos - prev_pos
-		var moving_horizontally = abs(move_dir.x) > 0.1
-		var moving_vertically = abs(move_dir.y) > 0.1 and not moving_horizontally
 		
-		if moving_horizontally:
-			# Moving left or right — face that direction
-			facing_right = move_dir.x > 0
-			was_moving_horizontal = true
-		elif moving_vertically and was_moving_horizontal:
-			# Just turned vertical — flip to opposite direction
-			facing_right = not facing_right
-			was_moving_horizontal = false
-		
-		# Apply facing (all sprites face right when flip_h = false)
-		animated_sprite.flip_h = not facing_right
+		if abs(move_dir.x) > abs(move_dir.y):
+			# Primarily horizontal — face movement direction
+			last_h_facing_right = move_dir.x > 0
+			animated_sprite.flip_h = not last_h_facing_right
+		else:
+			# Primarily vertical — face opposite of last horizontal direction
+			animated_sprite.flip_h = last_h_facing_right
 		
 		# Check if reached the end
 		if path_follow.progress_ratio >= 1.0:
