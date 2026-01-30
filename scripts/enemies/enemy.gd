@@ -84,6 +84,8 @@ func _setup_animation():
 	animated_sprite.sprite_frames = frames
 	animated_sprite.play("walk")
 
+var last_position: Vector2 = Vector2.ZERO
+
 func _process(delta: float):
 	# Handle slow effect
 	if slow_timer > 0:
@@ -94,7 +96,16 @@ func _process(delta: float):
 	# Move along path
 	var path_follow = get_parent() as PathFollow2D
 	if path_follow:
+		var prev_pos = path_follow.global_position
 		path_follow.progress += speed * slow_multiplier * delta
+		var new_pos = path_follow.global_position
+		
+		# Flip sprite to face movement direction
+		var move_dir = new_pos - prev_pos
+		if move_dir.x < -0.1:
+			animated_sprite.flip_h = true
+		elif move_dir.x > 0.1:
+			animated_sprite.flip_h = false
 		
 		# Check if reached the end
 		if path_follow.progress_ratio >= 1.0:
