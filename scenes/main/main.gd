@@ -19,6 +19,7 @@ extends Node2D
 var enemy_scene: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 var selected_tower: String = ""
 var is_placing: bool = false
+var total_waves: int = 3
 
 func _ready():
 	GameManager.money_changed.connect(_on_money_changed)
@@ -60,7 +61,7 @@ func _process(_delta: float):
 func _update_ui():
 	money_label.text = "Gold: %d" % GameManager.money
 	lives_label.text = "Lives: %d" % GameManager.lives
-	wave_label.text = "Wave: %d" % GameManager.current_wave
+	wave_label.text = "Wave %d / %d" % [GameManager.current_wave, total_waves]
 	arrow_btn.disabled = not GameManager.can_afford("arrow_tower")
 	cannon_btn.disabled = not GameManager.can_afford("cannon_tower")
 	magic_btn.disabled = not GameManager.can_afford("magic_tower")
@@ -113,6 +114,8 @@ func _place_tower(world_pos: Vector2):
 func _on_start_wave_pressed():
 	if GameManager.is_wave_active:
 		return
+	if GameManager.current_wave >= total_waves:
+		return
 	GameManager.start_wave()
 	_spawn_wave()
 
@@ -157,16 +160,12 @@ func _check_wave_done():
 
 func _get_wave_data(wave: int) -> Array:
 	var waves: Array = [
+		# Wave 1: 5 enemies
 		[{"type": "basic", "count": 5, "delay": 1.0}],
-		[{"type": "basic", "count": 8, "delay": 0.8}],
-		[{"type": "basic", "count": 5, "delay": 1.0}, {"type": "fast", "count": 3, "delay": 0.6}],
-		[{"type": "basic", "count": 8, "delay": 0.8}, {"type": "fast", "count": 5, "delay": 0.5}],
-		[{"type": "basic", "count": 6, "delay": 0.8}, {"type": "fast", "count": 4, "delay": 0.5}, {"type": "tank", "count": 2, "delay": 2.0}],
-		[{"type": "basic", "count": 10, "delay": 0.6}, {"type": "fast", "count": 6, "delay": 0.4}, {"type": "tank", "count": 3, "delay": 1.5}],
-		[{"type": "fast", "count": 12, "delay": 0.3}, {"type": "tank", "count": 4, "delay": 1.2}],
-		[{"type": "basic", "count": 15, "delay": 0.5}, {"type": "fast", "count": 8, "delay": 0.3}, {"type": "tank", "count": 5, "delay": 1.0}],
-		[{"type": "fast", "count": 15, "delay": 0.25}, {"type": "tank", "count": 8, "delay": 0.8}],
-		[{"type": "basic", "count": 10, "delay": 0.5}, {"type": "fast", "count": 10, "delay": 0.3}, {"type": "tank", "count": 5, "delay": 0.8}, {"type": "boss", "count": 1, "delay": 3.0}],
+		# Wave 2: 10 enemies (doubled)
+		[{"type": "basic", "count": 7, "delay": 0.8}, {"type": "fast", "count": 3, "delay": 0.6}],
+		# Wave 3: 20 enemies (doubled again)
+		[{"type": "basic", "count": 10, "delay": 0.7}, {"type": "fast", "count": 6, "delay": 0.5}, {"type": "tank", "count": 4, "delay": 1.5}],
 	]
 	var index = min(wave - 1, waves.size() - 1)
 	return waves[index]
@@ -182,6 +181,9 @@ func _on_wave_started(_wave):
 
 func _on_wave_completed(_wave):
 	_update_ui()
+	if GameManager.current_wave >= total_waves:
+		start_wave_btn.text = "YOU WIN!"
+		start_wave_btn.disabled = true
 
 func _on_game_over():
 	start_wave_btn.text = "GAME OVER"
