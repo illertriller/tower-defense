@@ -42,22 +42,30 @@ func _update_ui():
 	start_wave_btn.disabled = GameManager.is_wave_active
 
 func _on_arrow_pressed():
+	print("Arrow button clicked!")
 	_select_tower("arrow_tower")
 
 func _on_cannon_pressed():
+	print("Cannon button clicked!")
 	_select_tower("cannon_tower")
 
 func _on_magic_pressed():
+	print("Magic button clicked!")
 	_select_tower("magic_tower")
 
 func _select_tower(type: String):
 	if GameManager.can_afford(type):
 		selected_tower = type
 		is_placing = true
+		print("Selected: ", type, " | is_placing: ", is_placing)
+	else:
+		print("Can't afford: ", type)
 
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed:
+		print("Mouse click! Button: ", event.button_index, " is_placing: ", is_placing)
 		if event.button_index == MOUSE_BUTTON_LEFT and is_placing:
+			print("Placing tower at: ", get_global_mouse_position())
 			_place_tower(get_global_mouse_position())
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			is_placing = false
