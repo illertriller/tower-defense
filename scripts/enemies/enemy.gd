@@ -6,7 +6,7 @@ extends Area2D
 signal died()
 signal reached_end()
 
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var health_bar: ProgressBar = $HealthBar
 
 var max_health: int = 50
@@ -15,28 +15,74 @@ var speed: float = 80.0
 var reward: int = 10
 var slow_multiplier: float = 1.0
 var slow_timer: float = 0.0
+var enemy_type: String = "basic"
 
 # Enemy type data
 var enemy_types: Dictionary = {
-	"basic": {"health": 50, "speed": 80, "reward": 10, "color": Color.RED},
-	"fast": {"health": 30, "speed": 150, "reward": 15, "color": Color.ORANGE},
-	"tank": {"health": 200, "speed": 40, "reward": 30, "color": Color.DARK_RED},
-	"boss": {"health": 500, "speed": 50, "reward": 100, "color": Color.PURPLE}
+	"basic": {"health": 50, "speed": 80, "reward": 10},
+	"fast": {"health": 30, "speed": 150, "reward": 15},
+	"tank": {"health": 200, "speed": 40, "reward": 30},
+	"boss": {"health": 500, "speed": 50, "reward": 100}
+}
+
+# Sprite sheet paths per type
+var sprite_sheets: Dictionary = {
+	"basic": "res://assets/sprites/enemies/basic_walk_sheet.png",
+	"fast": "res://assets/sprites/enemies/fast_walk_sheet.png",
+	"tank": "res://assets/sprites/enemies/tank_walk_sheet.png",
+	"boss": "res://assets/sprites/enemies/basic_walk_sheet.png"  # reuse pig for boss for now
+}
+
+# Animation speeds per type (FPS)
+var anim_speeds: Dictionary = {
+	"basic": 6.0,
+	"fast": 10.0,
+	"tank": 4.0,
+	"boss": 5.0
 }
 
 func setup(type: String):
+	enemy_type = type
 	if type in enemy_types:
 		var data = enemy_types[type]
 		max_health = data["health"]
 		health = max_health
 		speed = data["speed"]
 		reward = data["reward"]
-		# Temporary color indicator until we have sprites
-		modulate = data["color"]
 
 func _ready():
 	health_bar.max_value = max_health
 	health_bar.value = health
+	
+	# Load sprite sheet and create animation
+	_setup_animation()
+
+func _setup_animation():
+	var frames = SpriteFrames.new()
+	frames.remove_animation("default")
+	frames.add_animation("walk")
+	
+	var sheet_path = sprite_sheets.get(enemy_type, sprite_sheets["basic"])
+	var sheet_texture = load(sheet_path)
+	
+	if sheet_texture:
+		var sheet_image = sheet_texture.get_image()
+		var frame_width = 32
+		var frame_height = 32
+		var frame_count = sheet_image.get_width() / frame_width
+		
+		for i in range(frame_count):
+			# Extract each frame from the sprite sheet
+			var frame_image = Image.create(frame_width, frame_height, false, sheet_image.get_format())
+			frame_image.blit_rect(sheet_image, Rect2i(i * frame_width, 0, frame_width, frame_height), Vector2i(0, 0))
+			var frame_texture = ImageTexture.create_from_image(frame_image)
+			frames.add_frame("walk", frame_texture)
+		
+		frames.set_animation_speed("walk", anim_speeds.get(enemy_type, 6.0))
+		frames.set_animation_loop("walk", true)
+	
+	animated_sprite.sprite_frames = frames
+	animated_sprite.play("walk")
 
 func _process(delta: float):
 	# Handle slow effect
@@ -61,9 +107,10 @@ func take_damage(amount: int):
 	health_bar.value = health
 	
 	# Flash white on hit
-	modulate = Color.WHITE
+	animated_sprite.modulate = Color.WHITE
 	await get_tree().create_timer(0.1).timeout
-	# Reset to type color
+	if is_instance_valid(self):
+		animated_sprite.modulate = Color(1, 1, 1, 1)
 	
 	if health <= 0:
 		die()
@@ -75,6 +122,4 @@ func apply_slow(amount: float, duration: float):
 func die():
 	GameManager.enemy_killed(reward)
 	died.emit()
-	
-	# TODO: death animation / particles
 	queue_free()
