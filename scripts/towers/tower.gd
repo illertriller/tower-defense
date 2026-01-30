@@ -48,10 +48,6 @@ func _apply_setup(type: String):
 func _process(_delta: float):
 	_update_target()
 	
-	if current_target and is_instance_valid(current_target):
-		var direction = current_target.global_position - global_position
-		rotation = direction.angle()
-	
 	if can_shoot and current_target and is_instance_valid(current_target):
 		shoot()
 
