@@ -1,0 +1,82 @@
+[gd_scene load_steps=4 format=3 uid="uid://main001"]
+
+[ext_resource type="Script" path="res://scenes/main/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/towers/tower.tscn" id="3"]
+[ext_resource type="Script" path="res://scenes/main/path_draw.gd" id="4"]
+
+[sub_resource type="Curve2D" id="Curve2D_path"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -50, 200, 0, 0, 0, 0, 200, 200, 0, 0, 0, 0, 200, 400, 0, 0, 0, 0, 500, 400, 0, 0, 0, 0, 500, 150, 0, 0, 0, 0, 800, 150, 0, 0, 0, 0, 800, 500, 0, 0, 0, 0, 1100, 500, 0, 0, 0, 0, 1330, 300)
+}
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+tower_scene = ExtResource("3")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.22, 0.45, 0.18, 1)
+
+[node name="EnemyPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_path")
+script = ExtResource("4")
+
+[node name="TowersContainer" type="Node2D" parent="." groups=["towers_container"]]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="TopBar" type="HBoxContainer" parent="UI"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 500.0
+offset_bottom = 50.0
+
+[node name="MoneyLabel" type="Label" parent="UI/TopBar"]
+text = "Gold: 100"
+
+[node name="Spacer1" type="Control" parent="UI/TopBar"]
+custom_minimum_size = Vector2(30, 0)
+
+[node name="LivesLabel" type="Label" parent="UI/TopBar"]
+text = "Lives: 20"
+
+[node name="Spacer2" type="Control" parent="UI/TopBar"]
+custom_minimum_size = Vector2(30, 0)
+
+[node name="WaveLabel" type="Label" parent="UI/TopBar"]
+text = "Wave: 0"
+
+[node name="TowerPanel" type="HBoxContainer" parent="UI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -80.0
+offset_right = 200.0
+offset_bottom = -10.0
+alignment = 1
+
+[node name="ArrowBtn" type="Button" parent="UI/TowerPanel"]
+custom_minimum_size = Vector2(120, 60)
+text = "Arrow (50g)"
+
+[node name="CannonBtn" type="Button" parent="UI/TowerPanel"]
+custom_minimum_size = Vector2(120, 60)
+text = "Cannon (100g)"
+
+[node name="MagicBtn" type="Button" parent="UI/TowerPanel"]
+custom_minimum_size = Vector2(120, 60)
+text = "Magic (75g)"
+
+[node name="StartWaveBtn" type="Button" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 50.0
+text = "Start Wave!"

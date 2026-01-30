@@ -7,7 +7,7 @@
 config/name="Tower Defense"
 config/description="Pixel art tower defense game"
 run/main_scene="res://scenes/main/main.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
@@ -16,6 +16,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[autoload]
+
+GameManager="*res://scripts/managers/game_manager.gd"
 
 [rendering]
 
