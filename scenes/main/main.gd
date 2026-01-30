@@ -22,6 +22,9 @@ var enemy_scene: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 var tesla_tower_scene: PackedScene = preload("res://scenes/towers/tesla_tower.tscn")
 var selected_tower: String = ""
 var is_placing: bool = false
+var _spawning_complete: bool = false
+var _enemies_spawned: int = 0
+var _enemies_finished: int = 0  # died + reached_end
 
 func _ready():
 	# Connect signals
@@ -175,6 +178,10 @@ func _on_start_wave_pressed():
 	_spawn_wave()
 
 func _spawn_wave():
+	_spawning_complete = false
+	_enemies_spawned = 0
+	_enemies_finished = 0
+	
 	var waves = LevelData.get_waves(GameManager.current_level)
 	var wave_index = min(GameManager.current_wave - 1, waves.size() - 1)
 	var wave_data = waves[wave_index]
@@ -184,8 +191,14 @@ func _spawn_wave():
 		var delay: float = group["delay"]
 		var type: String = group["type"]
 		for i in range(count):
+			if not GameManager.game_active:
+				return  # Stop spawning if game ended
 			_spawn_enemy(type)
+			_enemies_spawned += 1
 			await get_tree().create_timer(delay).timeout
+	
+	_spawning_complete = true
+	_check_wave_done()
 
 func _spawn_enemy(type: String):
 	var follow = PathFollow2D.new()
@@ -199,21 +212,23 @@ func _spawn_enemy(type: String):
 	enemy.reached_end.connect(_on_enemy_reached_end.bind(follow))
 
 func _on_enemy_died(follow: PathFollow2D):
+	_enemies_finished += 1
 	if is_instance_valid(follow):
 		follow.queue_free()
 	_check_wave_done()
 
 func _on_enemy_reached_end(follow: PathFollow2D):
+	_enemies_finished += 1
 	if is_instance_valid(follow):
 		follow.queue_free()
 	_check_wave_done()
 
 func _check_wave_done():
-	await get_tree().create_timer(0.1).timeout
-	if GameManager.is_wave_active:
-		var remaining = enemy_path.get_child_count()
-		if remaining == 0:
-			GameManager.complete_wave()
+	if not GameManager.is_wave_active:
+		return
+	# Only complete wave when ALL enemies have been spawned AND all are finished
+	if _spawning_complete and _enemies_finished >= _enemies_spawned:
+		GameManager.complete_wave()
 	_update_ui()
 
 # Signal handlers
