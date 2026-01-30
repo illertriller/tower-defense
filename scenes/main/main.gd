@@ -1,7 +1,7 @@
 extends Node2D
 
-## Main scene controller
-## Handles UI updates, tower placement, wave management
+## Main scene controller — data-driven level gameplay
+## Loads path/wave data from LevelData based on GameManager.current_level
 
 @export var tower_scene: PackedScene
 
@@ -10,6 +10,7 @@ extends Node2D
 @onready var money_label: Label = $UI/TopBar/MoneyLabel
 @onready var lives_label: Label = $UI/TopBar/LivesLabel
 @onready var wave_label: Label = $UI/TopBar/WaveLabel
+@onready var level_label: Label = $UI/TopBar/LevelLabel
 @onready var start_wave_btn: Button = $UI/StartWaveBtn
 @onready var arrow_btn: Button = $UI/TowerPanel/ArrowBtn
 @onready var cannon_btn: Button = $UI/TowerPanel/CannonBtn
@@ -21,14 +22,15 @@ var enemy_scene: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 var tesla_tower_scene: PackedScene = preload("res://scenes/towers/tesla_tower.tscn")
 var selected_tower: String = ""
 var is_placing: bool = false
-var total_waves: int = 3
 
 func _ready():
+	# Connect signals
 	GameManager.money_changed.connect(_on_money_changed)
 	GameManager.lives_changed.connect(_on_lives_changed)
 	GameManager.wave_started.connect(_on_wave_started)
 	GameManager.wave_completed.connect(_on_wave_completed)
 	GameManager.game_over.connect(_on_game_over)
+	GameManager.level_complete.connect(_on_level_complete)
 	
 	arrow_btn.pressed.connect(_on_arrow_pressed)
 	cannon_btn.pressed.connect(_on_cannon_pressed)
@@ -36,35 +38,56 @@ func _ready():
 	tesla_btn.pressed.connect(_on_tesla_pressed)
 	start_wave_btn.pressed.connect(_on_start_wave_pressed)
 	
-	# Mark the path cells on the grid
-	grid_manager.mark_path_cells(enemy_path.curve)
+	# Load level data
+	_setup_level()
 	
-	# Setup ghost preview (hidden by default)
+	# Setup ghost preview
 	ghost_preview.visible = false
 	ghost_preview.size = Vector2(64, 64)
 	ghost_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	_update_ui()
 
+func _setup_level():
+	var level = GameManager.current_level
+	
+	# Set path from level data
+	var path_points = LevelData.get_path_points(level)
+	var curve = Curve2D.new()
+	for point in path_points:
+		curve.add_point(point)
+	enemy_path.curve = curve
+	
+	# Mark path cells on the grid
+	grid_manager.mark_path_cells(enemy_path.curve)
+	
+	# Force path to redraw
+	enemy_path.queue_redraw()
+
 func _process(_delta: float):
 	if is_placing:
-		# Show ghost preview at snapped position
 		var snap_pos = grid_manager.get_tower_snap_position(get_global_mouse_position())
 		ghost_preview.visible = true
 		ghost_preview.global_position = snap_pos - Vector2(32, 32)
 		
-		# Color based on whether placement is valid
 		if grid_manager.can_place_tower(get_global_mouse_position()):
-			ghost_preview.color = Color(0, 1, 0, 0.3)  # Green = valid
+			ghost_preview.color = Color(0, 1, 0, 0.3)
 		else:
-			ghost_preview.color = Color(1, 0, 0, 0.3)  # Red = invalid
+			ghost_preview.color = Color(1, 0, 0, 0.3)
 	else:
 		ghost_preview.visible = false
 
 func _update_ui():
 	money_label.text = "Gold: %d" % GameManager.money
 	lives_label.text = "Lives: %d" % GameManager.lives
-	wave_label.text = "Wave %d / %d" % [GameManager.current_wave, total_waves]
+	wave_label.text = "Wave %d / %d" % [GameManager.current_wave, GameManager.total_waves]
+	level_label.text = "Level %d — %s" % [GameManager.current_level, LevelData.get_level_name(GameManager.current_level)]
+	
+	arrow_btn.text = "Arrow (%dg)" % GameManager.tower_data["arrow_tower"]["cost"]
+	cannon_btn.text = "Cannon (%dg)" % GameManager.tower_data["cannon_tower"]["cost"]
+	magic_btn.text = "Magic (%dg)" % GameManager.tower_data["magic_tower"]["cost"]
+	tesla_btn.text = "Tesla (%dg)" % GameManager.tower_data["tesla_tower"]["cost"]
+	
 	arrow_btn.disabled = not GameManager.can_afford("arrow_tower")
 	cannon_btn.disabled = not GameManager.can_afford("cannon_tower")
 	magic_btn.disabled = not GameManager.can_afford("magic_tower")
@@ -95,6 +118,12 @@ func _unhandled_input(event: InputEvent):
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			is_placing = false
 			selected_tower = ""
+	
+	# ESC to deselect tower or pause (future)
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		if is_placing:
+			is_placing = false
+			selected_tower = ""
 
 func _place_tower(world_pos: Vector2):
 	if selected_tower.is_empty():
@@ -115,7 +144,6 @@ func _place_tower(world_pos: Vector2):
 	tower.setup(selected_tower)
 	$TowersContainer.add_child(tower)
 	
-	# Mark grid cells as occupied
 	grid_manager.place_tower(world_pos)
 	
 	is_placing = false
@@ -125,13 +153,16 @@ func _place_tower(world_pos: Vector2):
 func _on_start_wave_pressed():
 	if GameManager.is_wave_active:
 		return
-	if GameManager.current_wave >= total_waves:
+	if GameManager.current_wave >= GameManager.total_waves:
 		return
 	GameManager.start_wave()
 	_spawn_wave()
 
 func _spawn_wave():
-	var wave_data = _get_wave_data(GameManager.current_wave)
+	var waves = LevelData.get_waves(GameManager.current_level)
+	var wave_index = min(GameManager.current_wave - 1, waves.size() - 1)
+	var wave_data = waves[wave_index]
+	
 	for group in wave_data:
 		var count: int = group["count"]
 		var delay: float = group["delay"]
@@ -169,18 +200,7 @@ func _check_wave_done():
 			GameManager.complete_wave()
 	_update_ui()
 
-func _get_wave_data(wave: int) -> Array:
-	var waves: Array = [
-		# Wave 1: 5 enemies
-		[{"type": "basic", "count": 5, "delay": 1.0}],
-		# Wave 2: 10 enemies (doubled)
-		[{"type": "basic", "count": 7, "delay": 0.8}, {"type": "fast", "count": 3, "delay": 0.6}],
-		# Wave 3: 20 enemies (doubled again)
-		[{"type": "basic", "count": 10, "delay": 0.7}, {"type": "fast", "count": 6, "delay": 0.5}, {"type": "tank", "count": 4, "delay": 1.5}],
-	]
-	var index = min(wave - 1, waves.size() - 1)
-	return waves[index]
-
+# Signal handlers
 func _on_money_changed(_amount):
 	_update_ui()
 
@@ -192,10 +212,16 @@ func _on_wave_started(_wave):
 
 func _on_wave_completed(_wave):
 	_update_ui()
-	if GameManager.current_wave >= total_waves:
-		start_wave_btn.text = "YOU WIN!"
+	if GameManager.current_wave >= GameManager.total_waves:
+		start_wave_btn.text = "Level Clear!"
 		start_wave_btn.disabled = true
 
 func _on_game_over():
-	start_wave_btn.text = "GAME OVER"
-	start_wave_btn.disabled = true
+	# Short delay then show lose screen
+	await get_tree().create_timer(1.0).timeout
+	get_tree().change_scene_to_file("res://scenes/ui/lose_screen.tscn")
+
+func _on_level_complete(_level: int):
+	# Short delay then show win screen
+	await get_tree().create_timer(1.5).timeout
+	get_tree().change_scene_to_file("res://scenes/ui/win_screen.tscn")

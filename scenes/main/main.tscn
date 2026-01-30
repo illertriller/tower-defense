@@ -6,11 +6,6 @@
 [ext_resource type="Script" path="res://scripts/managers/grid_manager.gd" id="5"]
 [ext_resource type="Script" path="res://scenes/main/background.gd" id="6"]
 
-[sub_resource type="Curve2D" id="Curve2D_path"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, -48, 208, 0, 0, 0, 0, 208, 208, 0, 0, 0, 0, 208, 400, 0, 0, 0, 0, 496, 400, 0, 0, 0, 0, 496, 144, 0, 0, 0, 0, 784, 144, 0, 0, 0, 0, 784, 496, 0, 0, 0, 0, 1104, 496, 0, 0, 0, 0, 1328, 304)
-}
-
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
 tower_scene = ExtResource("3")
@@ -22,7 +17,6 @@ script = ExtResource("6")
 script = ExtResource("5")
 
 [node name="EnemyPath" type="Path2D" parent="."]
-curve = SubResource("Curve2D_path")
 script = ExtResource("4")
 
 [node name="TowersContainer" type="Node2D" parent="." groups=["towers_container"]]
@@ -39,8 +33,14 @@ color = Color(0, 1, 0, 0.3)
 [node name="TopBar" type="HBoxContainer" parent="UI"]
 offset_left = 10.0
 offset_top = 10.0
-offset_right = 500.0
+offset_right = 800.0
 offset_bottom = 50.0
+
+[node name="LevelLabel" type="Label" parent="UI/TopBar"]
+text = "Level 1"
+
+[node name="Spacer0" type="Control" parent="UI/TopBar"]
+custom_minimum_size = Vector2(30, 0)
 
 [node name="MoneyLabel" type="Label" parent="UI/TopBar"]
 text = "Gold: 100"
@@ -55,7 +55,7 @@ text = "Lives: 20"
 custom_minimum_size = Vector2(30, 0)
 
 [node name="WaveLabel" type="Label" parent="UI/TopBar"]
-text = "Wave: 0"
+text = "Wave: 0 / 10"
 
 [node name="TowerPanel" type="HBoxContainer" parent="UI"]
 anchors_preset = 7
@@ -63,9 +63,9 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -200.0
+offset_left = -260.0
 offset_top = -80.0
-offset_right = 200.0
+offset_right = 260.0
 offset_bottom = -10.0
 alignment = 1
 
@@ -83,7 +83,7 @@ text = "Magic (75g)"
 
 [node name="TeslaBtn" type="Button" parent="UI/TowerPanel"]
 custom_minimum_size = Vector2(120, 60)
-text = "Tesla (1g)"
+text = "Tesla (125g)"
 
 [node name="StartWaveBtn" type="Button" parent="UI"]
 anchors_preset = 1

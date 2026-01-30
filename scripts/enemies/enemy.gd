@@ -15,30 +15,62 @@ var speed: float = 80.0
 var reward: int = 10
 var slow_multiplier: float = 1.0
 var slow_timer: float = 0.0
-var enemy_type: String = "basic"
+var enemy_type: String = "imp"
 
-# Enemy type data
+# All 10 demon enemy types with stats
 var enemy_types: Dictionary = {
-	"basic": {"health": 50, "speed": 80, "reward": 10},
-	"fast": {"health": 30, "speed": 150, "reward": 15},
-	"tank": {"health": 200, "speed": 40, "reward": 30},
-	"boss": {"health": 500, "speed": 50, "reward": 100}
+	"imp": {"health": 40, "speed": 80, "reward": 5},
+	"hell_hound": {"health": 25, "speed": 160, "reward": 8},
+	"brute_demon": {"health": 200, "speed": 40, "reward": 20},
+	"wraith": {"health": 60, "speed": 90, "reward": 12},
+	"fire_elemental": {"health": 80, "speed": 70, "reward": 15},
+	"shadow_stalker": {"health": 50, "speed": 100, "reward": 12},
+	"bone_golem": {"health": 400, "speed": 25, "reward": 35},
+	"succubus": {"health": 70, "speed": 75, "reward": 20},
+	"hell_knight": {"health": 250, "speed": 50, "reward": 30},
+	"demon_lord": {"health": 1000, "speed": 30, "reward": 100},
+	# Legacy types (fallback to new equivalents)
+	"basic": {"health": 40, "speed": 80, "reward": 5},
+	"fast": {"health": 25, "speed": 160, "reward": 8},
+	"tank": {"health": 200, "speed": 40, "reward": 20},
+	"boss": {"health": 1000, "speed": 30, "reward": 100},
 }
 
 # Sprite sheet paths per type
 var sprite_sheets: Dictionary = {
-	"basic": "res://assets/sprites/enemies/basic_walk_sheet.png",
-	"fast": "res://assets/sprites/enemies/fast_walk_sheet.png",
-	"tank": "res://assets/sprites/enemies/tank_walk_sheet.png",
-	"boss": "res://assets/sprites/enemies/basic_walk_sheet.png"  # reuse pig for boss for now
+	"imp": "res://assets/sprites/enemies/imp_walk_sheet.png",
+	"hell_hound": "res://assets/sprites/enemies/hell_hound_walk_sheet.png",
+	"brute_demon": "res://assets/sprites/enemies/brute_demon_walk_sheet.png",
+	"wraith": "res://assets/sprites/enemies/wraith_walk_sheet.png",
+	"fire_elemental": "res://assets/sprites/enemies/fire_elemental_walk_sheet.png",
+	"shadow_stalker": "res://assets/sprites/enemies/shadow_stalker_walk_sheet.png",
+	"bone_golem": "res://assets/sprites/enemies/bone_golem_walk_sheet.png",
+	"succubus": "res://assets/sprites/enemies/succubus_walk_sheet.png",
+	"hell_knight": "res://assets/sprites/enemies/hell_knight_walk_sheet.png",
+	"demon_lord": "res://assets/sprites/enemies/demon_lord_walk_sheet.png",
+	# Legacy fallbacks
+	"basic": "res://assets/sprites/enemies/imp_walk_sheet.png",
+	"fast": "res://assets/sprites/enemies/hell_hound_walk_sheet.png",
+	"tank": "res://assets/sprites/enemies/brute_demon_walk_sheet.png",
+	"boss": "res://assets/sprites/enemies/demon_lord_walk_sheet.png",
 }
 
 # Animation speeds per type (FPS)
 var anim_speeds: Dictionary = {
+	"imp": 6.0,
+	"hell_hound": 10.0,
+	"brute_demon": 4.0,
+	"wraith": 5.0,
+	"fire_elemental": 7.0,
+	"shadow_stalker": 8.0,
+	"bone_golem": 3.0,
+	"succubus": 6.0,
+	"hell_knight": 5.0,
+	"demon_lord": 4.0,
 	"basic": 6.0,
 	"fast": 10.0,
 	"tank": 4.0,
-	"boss": 5.0
+	"boss": 4.0,
 }
 
 func setup(type: String):
@@ -53,8 +85,6 @@ func setup(type: String):
 func _ready():
 	health_bar.max_value = max_health
 	health_bar.value = health
-	
-	# Load sprite sheet and create animation
 	_setup_animation()
 
 func _setup_animation():
@@ -62,7 +92,7 @@ func _setup_animation():
 	frames.remove_animation("default")
 	frames.add_animation("walk")
 	
-	var sheet_path = sprite_sheets.get(enemy_type, sprite_sheets["basic"])
+	var sheet_path = sprite_sheets.get(enemy_type, sprite_sheets["imp"])
 	var sheet_texture = load(sheet_path)
 	
 	if sheet_texture:
@@ -72,7 +102,6 @@ func _setup_animation():
 		var frame_count = sheet_image.get_width() / frame_width
 		
 		for i in range(frame_count):
-			# Extract each frame from the sprite sheet
 			var frame_image = Image.create(frame_width, frame_height, false, sheet_image.get_format())
 			frame_image.blit_rect(sheet_image, Rect2i(i * frame_width, 0, frame_width, frame_height), Vector2i(0, 0))
 			var frame_texture = ImageTexture.create_from_image(frame_image)
@@ -80,9 +109,43 @@ func _setup_animation():
 		
 		frames.set_animation_speed("walk", anim_speeds.get(enemy_type, 6.0))
 		frames.set_animation_loop("walk", true)
+	else:
+		# Fallback: create a colored placeholder if sprite not found
+		_create_placeholder_frames(frames)
 	
 	animated_sprite.sprite_frames = frames
 	animated_sprite.play("walk")
+
+func _create_placeholder_frames(frames: SpriteFrames):
+	# Generate a colored rectangle as placeholder
+	var colors = {
+		"imp": Color.RED,
+		"hell_hound": Color.ORANGE_RED,
+		"brute_demon": Color.DARK_RED,
+		"wraith": Color(0.5, 0.3, 0.8),
+		"fire_elemental": Color.ORANGE,
+		"shadow_stalker": Color(0.2, 0.2, 0.3),
+		"bone_golem": Color(0.9, 0.9, 0.8),
+		"succubus": Color(0.7, 0.2, 0.5),
+		"hell_knight": Color(0.5, 0.1, 0.1),
+		"demon_lord": Color(0.8, 0.0, 0.0),
+	}
+	var color = colors.get(enemy_type, Color.RED)
+	
+	for i in range(4):
+		var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(color)
+		# Draw a simple border
+		for x in range(64):
+			img.set_pixel(x, 0, Color.BLACK)
+			img.set_pixel(x, 63, Color.BLACK)
+		for y in range(64):
+			img.set_pixel(0, y, Color.BLACK)
+			img.set_pixel(63, y, Color.BLACK)
+		frames.add_frame("walk", ImageTexture.create_from_image(img))
+	
+	frames.set_animation_speed("walk", 6.0)
+	frames.set_animation_loop("walk", true)
 
 var last_h_facing_right: bool = true
 
@@ -104,11 +167,9 @@ func _process(delta: float):
 		var move_dir = new_pos - prev_pos
 		
 		if abs(move_dir.x) > abs(move_dir.y):
-			# Primarily horizontal — face movement direction
 			last_h_facing_right = move_dir.x > 0
 			animated_sprite.flip_h = not last_h_facing_right
 		else:
-			# Primarily vertical — face opposite of last horizontal direction
 			animated_sprite.flip_h = last_h_facing_right
 		
 		# Check if reached the end
@@ -122,7 +183,7 @@ func take_damage(amount: int):
 	health_bar.value = health
 	
 	# Flash white on hit
-	animated_sprite.modulate = Color.WHITE
+	animated_sprite.modulate = Color(2, 2, 2, 1)
 	await get_tree().create_timer(0.1).timeout
 	if is_instance_valid(self):
 		animated_sprite.modulate = Color(1, 1, 1, 1)
