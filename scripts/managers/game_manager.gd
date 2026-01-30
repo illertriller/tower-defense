@@ -31,7 +31,7 @@ var game_active: bool = true
 var tower_data: Dictionary = {
 	"arrow_tower": {
 		"name": "Arrow Tower",
-		"cost": 50,
+		"cost": 1,
 		"damage": 10,
 		"range": 150.0,
 		"fire_rate": 1.0,  # shots per second
@@ -40,7 +40,7 @@ var tower_data: Dictionary = {
 	},
 	"cannon_tower": {
 		"name": "Cannon Tower",
-		"cost": 100,
+		"cost": 1,
 		"damage": 30,
 		"range": 120.0,
 		"fire_rate": 0.5,
@@ -49,7 +49,7 @@ var tower_data: Dictionary = {
 	},
 	"magic_tower": {
 		"name": "Magic Tower",
-		"cost": 75,
+		"cost": 1,
 		"damage": 15,
 		"range": 180.0,
 		"fire_rate": 0.8,
