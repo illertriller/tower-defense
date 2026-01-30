@@ -6,6 +6,7 @@ extends Node2D
 @export var tower_scene: PackedScene
 
 @onready var enemy_path: Path2D = $EnemyPath
+@onready var grid_manager: Node2D = $GridManager
 @onready var money_label: Label = $UI/TopBar/MoneyLabel
 @onready var lives_label: Label = $UI/TopBar/LivesLabel
 @onready var wave_label: Label = $UI/TopBar/WaveLabel
@@ -13,6 +14,7 @@ extends Node2D
 @onready var arrow_btn: Button = $UI/TowerPanel/ArrowBtn
 @onready var cannon_btn: Button = $UI/TowerPanel/CannonBtn
 @onready var magic_btn: Button = $UI/TowerPanel/MagicBtn
+@onready var ghost_preview: ColorRect = $GhostPreview
 
 var enemy_scene: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 var selected_tower: String = ""
@@ -30,7 +32,30 @@ func _ready():
 	magic_btn.pressed.connect(_on_magic_pressed)
 	start_wave_btn.pressed.connect(_on_start_wave_pressed)
 	
+	# Mark the path cells on the grid
+	grid_manager.mark_path_cells(enemy_path.curve)
+	
+	# Setup ghost preview (hidden by default)
+	ghost_preview.visible = false
+	ghost_preview.size = Vector2(64, 64)
+	ghost_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
 	_update_ui()
+
+func _process(_delta: float):
+	if is_placing:
+		# Show ghost preview at snapped position
+		var snap_pos = grid_manager.get_tower_snap_position(get_global_mouse_position())
+		ghost_preview.visible = true
+		ghost_preview.global_position = snap_pos - Vector2(32, 32)
+		
+		# Color based on whether placement is valid
+		if grid_manager.can_place_tower(get_global_mouse_position()):
+			ghost_preview.color = Color(0, 1, 0, 0.3)  # Green = valid
+		else:
+			ghost_preview.color = Color(1, 0, 0, 0.3)  # Red = invalid
+	else:
+		ghost_preview.visible = false
 
 func _update_ui():
 	money_label.text = "Gold: %d" % GameManager.money
@@ -42,50 +67,45 @@ func _update_ui():
 	start_wave_btn.disabled = GameManager.is_wave_active
 
 func _on_arrow_pressed():
-	print("Arrow button clicked!")
 	_select_tower("arrow_tower")
 
 func _on_cannon_pressed():
-	print("Cannon button clicked!")
 	_select_tower("cannon_tower")
 
 func _on_magic_pressed():
-	print("Magic button clicked!")
 	_select_tower("magic_tower")
 
 func _select_tower(type: String):
 	if GameManager.can_afford(type):
 		selected_tower = type
 		is_placing = true
-		print("Selected: ", type, " | is_placing: ", is_placing)
-	else:
-		print("Can't afford: ", type)
 
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed:
-		print("Mouse click! Button: ", event.button_index, " is_placing: ", is_placing)
 		if event.button_index == MOUSE_BUTTON_LEFT and is_placing:
-			print("Placing tower at: ", get_global_mouse_position())
 			_place_tower(get_global_mouse_position())
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			is_placing = false
 			selected_tower = ""
 
-func _input(event: InputEvent):
-	# Show cursor feedback when placing
-	if is_placing and event is InputEventMouseMotion:
-		# Could add ghost tower preview here later
-		pass
-
-func _place_tower(pos: Vector2):
+func _place_tower(world_pos: Vector2):
 	if selected_tower.is_empty():
+		return
+	if not grid_manager.can_place_tower(world_pos):
 		return
 	if not GameManager.buy_tower(selected_tower):
 		return
+	
+	var snap_pos = grid_manager.get_tower_snap_position(world_pos)
+	
 	var tower = tower_scene.instantiate()
-	tower.global_position = pos
+	tower.global_position = snap_pos
 	tower.setup(selected_tower)
 	$TowersContainer.add_child(tower)
+	
+	# Mark grid cells as occupied
+	grid_manager.place_tower(world_pos)
+	
 	is_placing = false
 	selected_tower = ""
 	_update_ui()
