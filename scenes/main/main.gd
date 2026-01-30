@@ -14,9 +14,11 @@ extends Node2D
 @onready var arrow_btn: Button = $UI/TowerPanel/ArrowBtn
 @onready var cannon_btn: Button = $UI/TowerPanel/CannonBtn
 @onready var magic_btn: Button = $UI/TowerPanel/MagicBtn
+@onready var tesla_btn: Button = $UI/TowerPanel/TeslaBtn
 @onready var ghost_preview: ColorRect = $GhostPreview
 
 var enemy_scene: PackedScene = preload("res://scenes/enemies/enemy.tscn")
+var tesla_tower_scene: PackedScene = preload("res://scenes/towers/tesla_tower.tscn")
 var selected_tower: String = ""
 var is_placing: bool = false
 var total_waves: int = 3
@@ -31,6 +33,7 @@ func _ready():
 	arrow_btn.pressed.connect(_on_arrow_pressed)
 	cannon_btn.pressed.connect(_on_cannon_pressed)
 	magic_btn.pressed.connect(_on_magic_pressed)
+	tesla_btn.pressed.connect(_on_tesla_pressed)
 	start_wave_btn.pressed.connect(_on_start_wave_pressed)
 	
 	# Mark the path cells on the grid
@@ -65,6 +68,7 @@ func _update_ui():
 	arrow_btn.disabled = not GameManager.can_afford("arrow_tower")
 	cannon_btn.disabled = not GameManager.can_afford("cannon_tower")
 	magic_btn.disabled = not GameManager.can_afford("magic_tower")
+	tesla_btn.disabled = not GameManager.can_afford("tesla_tower")
 	start_wave_btn.disabled = GameManager.is_wave_active
 
 func _on_arrow_pressed():
@@ -75,6 +79,9 @@ func _on_cannon_pressed():
 
 func _on_magic_pressed():
 	_select_tower("magic_tower")
+
+func _on_tesla_pressed():
+	_select_tower("tesla_tower")
 
 func _select_tower(type: String):
 	if GameManager.can_afford(type):
@@ -99,7 +106,11 @@ func _place_tower(world_pos: Vector2):
 	
 	var snap_pos = grid_manager.get_tower_snap_position(world_pos)
 	
-	var tower = tower_scene.instantiate()
+	var tower: Node2D
+	if selected_tower == "tesla_tower":
+		tower = tesla_tower_scene.instantiate()
+	else:
+		tower = tower_scene.instantiate()
 	tower.global_position = snap_pos
 	tower.setup(selected_tower)
 	$TowersContainer.add_child(tower)

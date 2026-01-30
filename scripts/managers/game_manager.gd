@@ -55,6 +55,15 @@ var tower_data: Dictionary = {
 		"fire_rate": 0.8,
 		"projectile_speed": 250.0,
 		"description": "Long range. Slows enemies."
+	},
+	"tesla_tower": {
+		"name": "Tesla Tower",
+		"cost": 1,
+		"damage": 5,
+		"range": 140.0,
+		"fire_rate": 4.0,
+		"projectile_speed": 0.0,
+		"description": "Electric zap. Hits up to 3 enemies at once."
 	}
 }
 

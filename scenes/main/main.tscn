@@ -83,6 +83,10 @@ text = "Cannon (100g)"
 custom_minimum_size = Vector2(120, 60)
 text = "Magic (75g)"
 
+[node name="TeslaBtn" type="Button" parent="UI/TowerPanel"]
+custom_minimum_size = Vector2(120, 60)
+text = "Tesla (1g)"
+
 [node name="StartWaveBtn" type="Button" parent="UI"]
 anchors_preset = 1
 anchor_left = 1.0
