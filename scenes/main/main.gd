@@ -83,10 +83,10 @@ func _update_ui():
 	wave_label.text = "Wave %d / %d" % [GameManager.current_wave, GameManager.total_waves]
 	level_label.text = "Level %d — %s" % [GameManager.current_level, LevelData.get_level_name(GameManager.current_level)]
 	
-	arrow_btn.text = "Arrow (%dg)" % GameManager.tower_data["arrow_tower"]["cost"]
-	cannon_btn.text = "Cannon (%dg)" % GameManager.tower_data["cannon_tower"]["cost"]
-	magic_btn.text = "Magic (%dg)" % GameManager.tower_data["magic_tower"]["cost"]
-	tesla_btn.text = "Tesla (%dg)" % GameManager.tower_data["tesla_tower"]["cost"]
+	arrow_btn.text = "[1] Arrow (%dg)" % GameManager.tower_data["arrow_tower"]["cost"]
+	cannon_btn.text = "[2] Cannon (%dg)" % GameManager.tower_data["cannon_tower"]["cost"]
+	magic_btn.text = "[3] Magic (%dg)" % GameManager.tower_data["magic_tower"]["cost"]
+	tesla_btn.text = "[4] Tesla (%dg)" % GameManager.tower_data["tesla_tower"]["cost"]
 	
 	arrow_btn.disabled = not GameManager.can_afford("arrow_tower")
 	cannon_btn.disabled = not GameManager.can_afford("cannon_tower")
@@ -119,11 +119,27 @@ func _unhandled_input(event: InputEvent):
 			is_placing = false
 			selected_tower = ""
 	
-	# ESC to deselect tower or pause (future)
+	# ESC to deselect tower, or back to menu if nothing selected
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if is_placing:
 			is_placing = false
 			selected_tower = ""
+		else:
+			get_tree().change_scene_to_file("res://scenes/ui/start_menu.tscn")
+	
+	# Keyboard shortcuts for tower selection: 1-4
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_1:
+				_select_tower("arrow_tower")
+			KEY_2:
+				_select_tower("cannon_tower")
+			KEY_3:
+				_select_tower("magic_tower")
+			KEY_4:
+				_select_tower("tesla_tower")
+			KEY_SPACE:
+				_on_start_wave_pressed()
 
 func _place_tower(world_pos: Vector2):
 	if selected_tower.is_empty():
