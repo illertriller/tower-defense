@@ -67,8 +67,8 @@ func _setup_animation():
 	
 	if sheet_texture:
 		var sheet_image = sheet_texture.get_image()
-		var frame_width = 32
-		var frame_height = 32
+		var frame_width = 64
+		var frame_height = 64
 		var frame_count = sheet_image.get_width() / frame_width
 		
 		for i in range(frame_count):
