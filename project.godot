@@ -1,0 +1,22 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; but EDI doesn't have that luxury 🤖
+
+[application]
+
+config/name="Tower Defense"
+config/description="Pixel art tower defense game"
+run/main_scene="res://scenes/main/main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

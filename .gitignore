@@ -1,0 +1,17 @@
+# Godot 4 specific ignores
+.godot/
+*.tmp
+*.translation
+export_presets.cfg
+
+# Imported assets cache
+.import/
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+*.swp
+*.swo
