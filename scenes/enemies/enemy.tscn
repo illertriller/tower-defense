@@ -3,6 +3,9 @@
 [ext_resource type="Script" path="res://scripts/enemies/enemy.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/basic_enemy.png" id="2"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 12.0
+
 [node name="Enemy" type="Area2D" groups=["enemies"]]
 collision_layer = 2
 collision_mask = 4
@@ -22,6 +25,3 @@ offset_right = 16.0
 offset_bottom = -18.0
 show_percentage = false
 value = 100.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
-radius = 12.0
