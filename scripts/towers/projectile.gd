@@ -6,8 +6,17 @@ var target: Area2D = null
 var damage: int = 10
 var speed: float = 300.0
 var direction: Vector2 = Vector2.ZERO
+var projectile_type: String = "arrow"
 
 func _ready():
+	# Set projectile sprite based on type
+	var proj_textures = {
+		"arrow": "res://assets/sprites/projectiles/arrow_proj.png",
+		"cannon": "res://assets/sprites/projectiles/cannon_proj.png",
+		"magic": "res://assets/sprites/projectiles/magic_proj.png"
+	}
+	if proj_textures.has(projectile_type):
+		$Sprite2D.texture = load(proj_textures[projectile_type])
 	if target and is_instance_valid(target):
 		direction = (target.global_position - global_position).normalized()
 	# Auto-destroy after 3 seconds if it misses

@@ -13,7 +13,7 @@ projectile_scene = ExtResource("3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2")
-scale = Vector2(2, 2)
+scale = Vector2(1, 1)
 
 [node name="RangeArea" type="Area2D" parent="."]
 collision_layer = 0

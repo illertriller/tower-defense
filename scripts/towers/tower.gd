@@ -35,6 +35,15 @@ func _apply_setup(type: String):
 	fire_rate = data["fire_rate"]
 	projectile_speed = data["projectile_speed"]
 	
+	# Set tower sprite based on type
+	var tower_textures = {
+		"arrow_tower": "res://assets/sprites/towers/arrow_tower.png",
+		"cannon_tower": "res://assets/sprites/towers/cannon_tower.png",
+		"magic_tower": "res://assets/sprites/towers/magic_tower.png"
+	}
+	if tower_textures.has(type):
+		sprite.texture = load(tower_textures[type])
+	
 	# Set range collision shape
 	var shape = CircleShape2D.new()
 	shape.radius = attack_range
@@ -90,6 +99,15 @@ func shoot():
 	projectile.target = current_target
 	projectile.damage = damage
 	projectile.speed = projectile_speed
+	
+	# Set projectile type to match tower
+	var proj_type_map = {
+		"arrow_tower": "arrow",
+		"cannon_tower": "cannon",
+		"magic_tower": "magic"
+	}
+	if proj_type_map.has(tower_type):
+		projectile.projectile_type = proj_type_map[tower_type]
 	
 	get_tree().root.add_child(projectile)
 
