@@ -101,10 +101,11 @@ func _process(delta: float):
 		var new_pos = path_follow.global_position
 		
 		# Flip sprite to face movement direction
+		# Sprites face left by default, flip when moving right
 		var move_dir = new_pos - prev_pos
-		if move_dir.x < -0.1:
+		if move_dir.x > 0.1:
 			animated_sprite.flip_h = true
-		elif move_dir.x > 0.1:
+		elif move_dir.x < -0.1:
 			animated_sprite.flip_h = false
 		
 		# Check if reached the end
