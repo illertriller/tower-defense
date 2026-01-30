@@ -16,6 +16,7 @@ var reward: int = 10
 var slow_multiplier: float = 1.0
 var slow_timer: float = 0.0
 var enemy_type: String = "basic"
+var sprite_faces_right: bool = false  # default facing direction of the sprite
 
 # Enemy type data
 var enemy_types: Dictionary = {
@@ -41,8 +42,17 @@ var anim_speeds: Dictionary = {
 	"boss": 5.0
 }
 
+# Which direction each sprite faces by default
+var sprite_default_faces_right: Dictionary = {
+	"basic": false,   # pig faces left
+	"fast": true,     # rabbit faces right
+	"tank": true,     # turtle faces right
+	"boss": false
+}
+
 func setup(type: String):
 	enemy_type = type
+	sprite_faces_right = sprite_default_faces_right.get(type, false)
 	if type in enemy_types:
 		var data = enemy_types[type]
 		max_health = data["health"]
@@ -101,12 +111,19 @@ func _process(delta: float):
 		var new_pos = path_follow.global_position
 		
 		# Flip sprite to face movement direction
-		# Sprites face left by default, flip when moving right
 		var move_dir = new_pos - prev_pos
-		if move_dir.x > 0.1:
-			animated_sprite.flip_h = true
-		elif move_dir.x < -0.1:
-			animated_sprite.flip_h = false
+		if sprite_faces_right:
+			# Sprite naturally faces right — flip when moving left
+			if move_dir.x < -0.1:
+				animated_sprite.flip_h = true
+			elif move_dir.x > 0.1:
+				animated_sprite.flip_h = false
+		else:
+			# Sprite naturally faces left — flip when moving right
+			if move_dir.x > 0.1:
+				animated_sprite.flip_h = true
+			elif move_dir.x < -0.1:
+				animated_sprite.flip_h = false
 		
 		# Check if reached the end
 		if path_follow.progress_ratio >= 1.0:
