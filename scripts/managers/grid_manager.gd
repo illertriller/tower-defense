@@ -95,6 +95,20 @@ func place_tower(world_pos: Vector2):
 		for dy in range(2):
 			grid[grid_pos.x + dx][grid_pos.y + dy] = CellState.TOWER
 
+# Free 2x2 cells when a tower is demolished
+func remove_tower(world_pos: Vector2):
+	var grid_pos = world_to_grid(world_pos)
+	grid_pos.x = clampi(grid_pos.x, 0, GRID_WIDTH - 2)
+	grid_pos.y = clampi(grid_pos.y, 0, GRID_HEIGHT - 2)
+	
+	for dx in range(2):
+		for dy in range(2):
+			var cx = grid_pos.x + dx
+			var cy = grid_pos.y + dy
+			if cx < GRID_WIDTH and cy < GRID_HEIGHT:
+				if grid[cx][cy] == CellState.TOWER:
+					grid[cx][cy] = CellState.EMPTY
+
 # Mark cells along the enemy path
 func mark_path_cells(path_curve: Curve2D):
 	if not path_curve:

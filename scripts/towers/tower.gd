@@ -277,6 +277,18 @@ func _aoe_damage():
 					_tower_data.get("burn_duration", 2.0)
 				)
 
+# === VALUE / DEMOLISH ===
+func get_total_value() -> int:
+	var total = _tower_data.get("cost", 0)
+	if GameManager.upgrade_data.has(tower_type):
+		var paths = GameManager.upgrade_data[tower_type]
+		for path_key in paths:
+			var level = upgrade_levels.get(path_key, 0)
+			var upgrades = paths[path_key]["upgrades"]
+			for i in range(level):
+				total += upgrades[i]["cost"]
+	return total
+
 # === UPGRADE SYSTEM ===
 func get_upgrade_info() -> Dictionary:
 	if not GameManager.upgrade_data.has(tower_type):

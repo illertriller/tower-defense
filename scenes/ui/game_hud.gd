@@ -5,6 +5,7 @@ extends CanvasLayer
 
 signal tower_selected(type: String)
 signal upgrade_requested(path: String)
+signal demolish_requested()
 signal wave_start_requested()
 
 @onready var top_bar: HBoxContainer = $TopBar
@@ -151,6 +152,14 @@ func _update_tower_info(tower: Node2D):
 			btn.disabled = true
 		
 		upgrade_container.add_child(btn)
+	
+	# Demolish button
+	var refund = tower.get_total_value() / 2
+	var demolish_btn = Button.new()
+	demolish_btn.custom_minimum_size = Vector2(0, 32)
+	demolish_btn.text = "🔨 Demolish (+%dg refund)" % refund
+	demolish_btn.pressed.connect(func(): demolish_requested.emit())
+	upgrade_container.add_child(demolish_btn)
 
 func clear_placed_tower():
 	_selected_placed_tower = null

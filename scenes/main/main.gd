@@ -44,6 +44,7 @@ func _ready():
 	# HUD signals
 	hud.tower_selected.connect(_on_hud_tower_selected)
 	hud.upgrade_requested.connect(_on_hud_upgrade_requested)
+	hud.demolish_requested.connect(_on_hud_demolish_requested)
 	hud.wave_start_requested.connect(_on_start_wave_pressed)
 	
 	_setup_level()
@@ -84,6 +85,17 @@ func _on_hud_upgrade_requested(path: String):
 	if selected_placed_tower and selected_placed_tower.has_method("apply_upgrade"):
 		selected_placed_tower.apply_upgrade(path)
 		hud.update_hud()
+
+func _on_hud_demolish_requested():
+	if not selected_placed_tower:
+		return
+	var refund = selected_placed_tower.get_total_value() / 2
+	GameManager.money += refund
+	grid_manager.remove_tower(selected_placed_tower.global_position)
+	GameParticles.spawn_death_poof(get_tree(), selected_placed_tower.global_position)
+	selected_placed_tower.queue_free()
+	_deselect_all()
+	hud.update_hud()
 
 func _deselect_all():
 	is_placing = false
