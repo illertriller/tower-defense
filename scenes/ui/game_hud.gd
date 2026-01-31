@@ -63,120 +63,201 @@ func _ready():
 	_build_tower_buttons()
 	_clear_info_panel()
 
-func _set_ui_linear_filter():
-	# Apply linear filtering to all UI containers so frame textures
-	# render smooth instead of chunky nearest-neighbor pixels
-	# (game world stays on nearest-neighbor for crisp pixel art sprites)
-	for node in get_children():
-		if node is CanvasItem:
-			node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+# === UI PALETTE ===
+const UI_BG = Color(0.08, 0.06, 0.04, 0.92)
+const UI_BG_LIGHT = Color(0.12, 0.09, 0.06, 0.95)
+const UI_GOLD = Color(0.75, 0.60, 0.22)
+const UI_GOLD_BRIGHT = Color(1.0, 0.85, 0.32)
+const UI_GOLD_DIM = Color(0.50, 0.40, 0.15)
+const UI_SHADOW = Color(0.0, 0.0, 0.0, 0.5)
 
-# === UI STYLING ===
+const DECO_PATH = "res://assets/sprites/ui/decorations/"
+
+# === UI STYLING — Flat panels + ornate decorations at native size ===
 func _apply_ui_style():
-	# Style bottom panel with frame texture
-	# Panel is 512x128 — big margins protect the ornate borders from stretching
-	var panel_tex = _load_tex("res://assets/sprites/ui/panel_frame.png")
-	if panel_tex:
-		var panel_style = StyleBoxTexture.new()
-		panel_style.texture = panel_tex
-		# Large margins = ornate corners/edges stay pixel-perfect, only center stretches
-		panel_style.texture_margin_left = 64
-		panel_style.texture_margin_right = 64
-		panel_style.texture_margin_top = 48
-		panel_style.texture_margin_bottom = 48
-		panel_style.content_margin_left = 12
-		panel_style.content_margin_right = 12
-		panel_style.content_margin_top = 8
-		panel_style.content_margin_bottom = 8
-		bottom_panel.add_theme_stylebox_override("panel", panel_style)
-	
-	# Style ESC menu panel (256x256 — generous margins for all corners)
-	var info_tex = _load_tex("res://assets/sprites/ui/info_frame.png")
-	if info_tex:
-		var esc_style = StyleBoxTexture.new()
-		esc_style.texture = info_tex
-		esc_style.texture_margin_left = 48
-		esc_style.texture_margin_right = 48
-		esc_style.texture_margin_top = 48
-		esc_style.texture_margin_bottom = 48
-		esc_style.content_margin_left = 16
-		esc_style.content_margin_right = 16
-		esc_style.content_margin_top = 16
-		esc_style.content_margin_bottom = 16
-		esc_menu.add_theme_stylebox_override("panel", esc_style)
-	
-	# Style top bar background (512x64 — wide margins for edge details)
-	var topbar_tex = _load_tex("res://assets/sprites/ui/topbar_frame.png")
-	if topbar_tex:
-		var topbar_style = StyleBoxTexture.new()
-		topbar_style.texture = topbar_tex
-		topbar_style.texture_margin_left = 64
-		topbar_style.texture_margin_right = 64
-		topbar_style.texture_margin_top = 24
-		topbar_style.texture_margin_bottom = 24
-		topbar_style.content_margin_left = 12
-		topbar_style.content_margin_right = 12
-		# Wrap top_bar in a panel
-		if top_bar.get_parent():
-			var top_panel = PanelContainer.new()
-			var parent = top_bar.get_parent()
-			var idx = top_bar.get_index()
-			parent.remove_child(top_bar)
-			top_panel.add_child(top_bar)
-			top_panel.add_theme_stylebox_override("panel", topbar_style)
-			parent.add_child(top_panel)
-			parent.move_child(top_panel, idx)
-			top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
-			top_panel.offset_left = 0
-			top_panel.offset_top = 0
-			top_panel.offset_right = 0
-			top_panel.offset_bottom = 44
-			top_panel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	
-	# Style buttons with textures
+	_style_bottom_panel()
+	_style_top_bar()
+	_style_esc_menu()
 	_style_all_buttons()
 
-func _style_all_buttons():
-	var btn_normal = _load_tex("res://assets/sprites/ui/button_normal.png")
-	var btn_hover = _load_tex("res://assets/sprites/ui/button_hover.png")
-	var btn_pressed = _load_tex("res://assets/sprites/ui/button_pressed.png")
-	if not btn_normal:
-		return
+func _style_bottom_panel():
+	# Clean flat base
+	var style = StyleBoxFlat.new()
+	style.bg_color = UI_BG
+	style.border_color = UI_GOLD
+	style.border_width_top = 3
+	style.border_width_bottom = 2
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 10
+	style.content_margin_bottom = 6
+	style.shadow_color = UI_SHADOW
+	style.shadow_size = 6
+	style.shadow_offset = Vector2(0, -2)
+	bottom_panel.add_theme_stylebox_override("panel", style)
 	
-	var normal_style = _make_btn_stylebox(btn_normal)
-	var hover_style = _make_btn_stylebox(btn_hover if btn_hover else btn_normal)
-	var pressed_style = _make_btn_stylebox(btn_pressed if btn_pressed else btn_normal)
-	var disabled_style = _make_btn_stylebox(btn_normal)
-	disabled_style.modulate_color = Color(0.5, 0.5, 0.5, 0.7)
-	
-	# Apply to specific buttons
-	for btn in [resume_btn, restart_btn, settings_btn, main_menu_btn, start_wave_btn]:
-		_apply_btn_style(btn, normal_style, hover_style, pressed_style, disabled_style)
+	# Decorative overlays at native size (no stretching!)
+	_add_decoration(bottom_panel, DECO_PATH + "panel_gem.png",
+		"top_center", Vector2(0, -28))
+	_add_decoration(bottom_panel, DECO_PATH + "panel_corner_ornament.png",
+		"top_left", Vector2(4, -4))
+	_add_decoration(bottom_panel, DECO_PATH + "panel_corner_ornament.png",
+		"top_right", Vector2(-4, -4), true)  # flip_h
+	# Divider line along top (tiled)
+	_add_tiled_decoration(bottom_panel, DECO_PATH + "panel_divider.png", "top")
 
-func _make_btn_stylebox(tex: Texture2D) -> StyleBoxTexture:
-	# Buttons are 256x64 — use big margins to protect ornate edges
-	var style = StyleBoxTexture.new()
-	style.texture = tex
-	style.texture_margin_left = 24
-	style.texture_margin_right = 24
-	style.texture_margin_top = 16
-	style.texture_margin_bottom = 16
-	style.content_margin_left = 12
-	style.content_margin_right = 12
+func _style_top_bar():
+	if not top_bar.get_parent():
+		return
+	var top_panel = PanelContainer.new()
+	var parent = top_bar.get_parent()
+	var idx = top_bar.get_index()
+	parent.remove_child(top_bar)
+	top_panel.add_child(top_bar)
+	parent.add_child(top_panel)
+	parent.move_child(top_panel, idx)
+	
+	top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	top_panel.offset_left = 0
+	top_panel.offset_top = 0
+	top_panel.offset_right = 0
+	top_panel.offset_bottom = 40
+	
+	var style = StyleBoxFlat.new()
+	style.bg_color = UI_BG
+	style.border_color = UI_GOLD
+	style.border_width_bottom = 2
+	style.content_margin_left = 16
+	style.content_margin_right = 16
 	style.content_margin_top = 6
 	style.content_margin_bottom = 6
+	style.shadow_color = UI_SHADOW
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(0, 2)
+	top_panel.add_theme_stylebox_override("panel", style)
+	
+	# Emblem decoration
+	_add_decoration(top_panel, DECO_PATH + "topbar_emblem.png",
+		"center_left", Vector2(6, 0))
+
+func _style_esc_menu():
+	var style = StyleBoxFlat.new()
+	style.bg_color = UI_BG_LIGHT
+	style.border_color = UI_GOLD
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(6)
+	style.set_content_margin_all(24)
+	style.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
+	style.shadow_size = 12
+	style.shadow_offset = Vector2(0, 4)
+	esc_menu.add_theme_stylebox_override("panel", style)
+	
+	# Corner ornaments
+	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
+		"top_left", Vector2(-6, -6))
+	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
+		"top_right", Vector2(6, -6), true)
+	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
+		"bottom_left", Vector2(-6, 6), false, true)
+	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
+		"bottom_right", Vector2(6, 6), true, true)
+
+func _style_all_buttons():
+	var normal = _make_flat_btn(UI_BG_LIGHT, UI_GOLD)
+	var hover = _make_flat_btn(Color(0.16, 0.12, 0.08, 0.95), UI_GOLD_BRIGHT)
+	var pressed = _make_flat_btn(Color(0.06, 0.04, 0.02, 0.95), UI_GOLD)
+	var disabled = _make_flat_btn(Color(0.08, 0.07, 0.06, 0.7), UI_GOLD_DIM)
+	
+	for btn in [resume_btn, restart_btn, settings_btn, main_menu_btn, start_wave_btn]:
+		btn.add_theme_stylebox_override("normal", normal)
+		btn.add_theme_stylebox_override("hover", hover)
+		btn.add_theme_stylebox_override("pressed", pressed)
+		btn.add_theme_stylebox_override("disabled", disabled)
+		btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+func _make_flat_btn(bg: Color, border: Color) -> StyleBoxFlat:
+	var style = StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(3)
+	style.set_content_margin_all(6)
 	return style
 
-func _apply_btn_style(btn: Button, normal: StyleBoxTexture, hover: StyleBoxTexture, pressed: StyleBoxTexture, disabled: StyleBoxTexture):
-	btn.add_theme_stylebox_override("normal", normal)
-	btn.add_theme_stylebox_override("hover", hover)
-	btn.add_theme_stylebox_override("pressed", pressed)
-	btn.add_theme_stylebox_override("disabled", disabled)
+# === DECORATION HELPERS ===
 
 func _load_tex(path: String) -> Texture2D:
 	if ResourceLoader.exists(path):
 		return load(path)
 	return null
+
+func _add_decoration(parent: Control, tex_path: String, anchor: String,
+		offset: Vector2 = Vector2.ZERO, flip_h: bool = false, flip_v: bool = false):
+	var tex = _load_tex(tex_path)
+	if not tex:
+		return
+	
+	var rect = TextureRect.new()
+	rect.texture = tex
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.flip_h = flip_h
+	rect.flip_v = flip_v
+	rect.z_index = 5
+	
+	# Size to texture (native, no stretching)
+	rect.stretch_mode = TextureRect.STRETCH_KEEP
+	rect.custom_minimum_size = tex.get_size()
+	rect.size = tex.get_size()
+	
+	parent.add_child(rect)
+	
+	# Position based on anchor point
+	match anchor:
+		"top_center":
+			rect.set_anchors_preset(Control.PRESET_CENTER_TOP)
+			rect.position = Vector2(-tex.get_width() / 2.0, 0) + offset
+		"top_left":
+			rect.set_anchors_preset(Control.PRESET_TOP_LEFT)
+			rect.position = offset
+		"top_right":
+			rect.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+			rect.position = Vector2(-tex.get_width(), 0) + offset
+		"bottom_left":
+			rect.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+			rect.position = Vector2(0, -tex.get_height()) + offset
+		"bottom_right":
+			rect.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+			rect.position = Vector2(-tex.get_width(), -tex.get_height()) + offset
+		"center_left":
+			rect.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+			rect.position = Vector2(0, -tex.get_height() / 2.0) + offset
+
+func _add_tiled_decoration(parent: Control, tex_path: String, edge: String):
+	var tex = _load_tex(tex_path)
+	if not tex:
+		return
+	
+	var rect = TextureRect.new()
+	rect.texture = tex
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.stretch_mode = TextureRect.STRETCH_TILE
+	rect.z_index = 4
+	
+	parent.add_child(rect)
+	
+	match edge:
+		"top":
+			rect.set_anchors_preset(Control.PRESET_TOP_WIDE)
+			rect.offset_top = -tex.get_height() / 2.0
+			rect.offset_bottom = tex.get_height() / 2.0
+			rect.offset_left = 60  # Avoid overlapping corner ornaments
+			rect.offset_right = -60
 
 # === TOWER SLOT STYLES ===
 func _make_tower_slot_style(border_color: Color, bg_color: Color) -> StyleBoxFlat:

@@ -15,7 +15,8 @@ func _ready():
 	start_btn.pressed.connect(_on_start_pressed)
 	settings_btn.pressed.connect(_on_settings_pressed)
 	exit_btn.pressed.connect(_on_exit_pressed)
-	settings_btn.disabled = false  # Settings now works!
+	settings_btn.disabled = false
+	_style_menu_buttons()
 	
 	# Animate title fade in
 	title_label.modulate.a = 0.0
@@ -24,6 +25,27 @@ func _ready():
 	var tween = create_tween()
 	tween.tween_property(title_label, "modulate:a", 1.0, 0.8)
 	tween.tween_property(subtitle_label, "modulate:a", 1.0, 0.6)
+
+func _style_menu_buttons():
+	var normal = StyleBoxFlat.new()
+	normal.bg_color = Color(0.12, 0.09, 0.06, 0.9)
+	normal.border_color = Color(0.75, 0.60, 0.22)
+	normal.set_border_width_all(2)
+	normal.set_corner_radius_all(4)
+	normal.set_content_margin_all(8)
+	
+	var hover = normal.duplicate()
+	hover.border_color = Color(1.0, 0.85, 0.32)
+	hover.bg_color = Color(0.18, 0.14, 0.08, 0.95)
+	
+	var pressed = normal.duplicate()
+	pressed.bg_color = Color(0.06, 0.04, 0.02, 0.95)
+	
+	for btn in [start_btn, settings_btn, exit_btn]:
+		btn.add_theme_stylebox_override("normal", normal)
+		btn.add_theme_stylebox_override("hover", hover)
+		btn.add_theme_stylebox_override("pressed", pressed)
+		btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 
 func _on_start_pressed():
 	get_tree().change_scene_to_file("res://scenes/ui/level_select.tscn")

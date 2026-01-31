@@ -13,6 +13,7 @@ signal closed()
 @onready var back_btn: Button = $Panel/VBox/BackBtn
 
 func _ready():
+	_style_panel()
 	_populate_options()
 	_load_current()
 	
@@ -55,6 +56,36 @@ func _on_edge_pan_toggled(pressed: bool):
 func _on_minimap_toggled(pressed: bool):
 	Settings.show_minimap = pressed
 	Settings.save_settings()
+
+func _style_panel():
+	var panel = $Panel
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.10, 0.08, 0.05, 0.95)
+	style.border_color = Color(0.75, 0.60, 0.22)
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(6)
+	style.set_content_margin_all(20)
+	style.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
+	style.shadow_size = 12
+	style.shadow_offset = Vector2(0, 4)
+	panel.add_theme_stylebox_override("panel", style)
+	
+	var normal = _make_btn(Color(0.12, 0.09, 0.06, 0.95), Color(0.75, 0.60, 0.22))
+	var hover = _make_btn(Color(0.16, 0.12, 0.08, 0.95), Color(1.0, 0.85, 0.32))
+	var pressed = _make_btn(Color(0.06, 0.04, 0.02, 0.95), Color(0.75, 0.60, 0.22))
+	back_btn.add_theme_stylebox_override("normal", normal)
+	back_btn.add_theme_stylebox_override("hover", hover)
+	back_btn.add_theme_stylebox_override("pressed", pressed)
+	back_btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+func _make_btn(bg: Color, border: Color) -> StyleBoxFlat:
+	var s = StyleBoxFlat.new()
+	s.bg_color = bg
+	s.border_color = border
+	s.set_border_width_all(2)
+	s.set_corner_radius_all(3)
+	s.set_content_margin_all(6)
+	return s
 
 func _on_back():
 	closed.emit()
