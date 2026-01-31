@@ -58,20 +58,22 @@
 | Level select screen | EDI | ✅ Done (Phase 1) |
 | Separated HUD scene (game_hud.tscn) | EDI | ✅ Done |
 
-## Phase 4: Polish & Juice
-**Target:** Final phase
+## Phase 4: Polish & Juice ⏳
+**Target:** 2026-01-31
 **Goal:** Professional feel, replayability
 
 | Task | Owner | Status |
 |------|-------|--------|
-| Sound effects (attacks, deaths, UI clicks) | EDI + Leonard | Pending |
-| Particle effects (explosions, magic, frost) | EDI | Pending |
-| Credits roll animation | EDI | Pending |
-| Highscore persistence (save/load) | EDI | Pending |
-| 5 unique map visual themes | Leonard | Pending |
-| Enemy death animations | Leonard | Pending |
-| Tower placement/build animations | EDI | Pending |
-| Final balancing pass | EDI + Martin | Pending |
+| Sound effects (attacks, deaths, UI clicks) | EDI | 🔜 Future |
+| Particle effects (explosions, magic, frost, build) | EDI | ✅ Done |
+| Credits roll animation | EDI | ✅ Done |
+| Highscore persistence (save/load) | EDI | ✅ Done |
+| 5 unique map visual themes | Leonard | ⏳ In progress |
+| Enemy death animations | Leonard | ⏳ In progress |
+| Tower placement/build animations | EDI | ✅ Done |
+| Level select highscore display | EDI | ✅ Done |
+| Terrain theme system (per-level textures) | EDI | ✅ Done |
+| Final balancing pass | EDI + Martin | 🔜 Needs testing |
 
 ---
 
