@@ -85,7 +85,7 @@ var default_faces_right: Dictionary = {
 var anim_speeds: Dictionary = {
 	"imp": 6.0,
 	"hell_hound": 10.0,
-	"brute_demon": 4.0,
+	"brute_demon": 5.0,
 	"wraith": 5.0,
 	"fire_elemental": 7.0,
 	"shadow_stalker": 8.0,
@@ -216,12 +216,13 @@ func _process(delta: float):
 		var move_dir = new_pos - prev_pos
 		var faces_right = default_faces_right.get(enemy_type, true)
 		
-		if abs(move_dir.x) > 0.5:
-			# Moving horizontally — flip if moving opposite to default facing
+		# Only update facing when there's clear horizontal dominance
+		# Prevents flickering on diagonal/transitional movements
+		if move_dir.length() > 0.1 and abs(move_dir.x) > abs(move_dir.y) * 1.5:
 			var moving_right = move_dir.x > 0
 			animated_sprite.flip_h = (moving_right != faces_right)
 			last_h_facing_right = moving_right
-		# When moving vertically, keep the last horizontal flip state
+		# When moving vertically or diagonally, keep the last horizontal flip state
 		
 		# Check if reached the end
 		if path_follow.progress_ratio >= 1.0:
