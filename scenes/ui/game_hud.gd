@@ -66,54 +66,57 @@ func _ready():
 func _set_ui_linear_filter():
 	# Apply linear filtering to all UI containers so frame textures
 	# render smooth instead of chunky nearest-neighbor pixels
-	for node in [bottom_panel, esc_menu]:
-		node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	# Top bar gets reparented in _apply_ui_style, so we handle it there
+	# (game world stays on nearest-neighbor for crisp pixel art sprites)
+	for node in get_children():
+		if node is CanvasItem:
+			node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 
 # === UI STYLING ===
 func _apply_ui_style():
 	# Style bottom panel with frame texture
+	# Panel is 512x128 — big margins protect the ornate borders from stretching
 	var panel_tex = _load_tex("res://assets/sprites/ui/panel_frame.png")
 	if panel_tex:
 		var panel_style = StyleBoxTexture.new()
 		panel_style.texture = panel_tex
-		panel_style.texture_margin_left = 16
-		panel_style.texture_margin_right = 16
-		panel_style.texture_margin_top = 16
-		panel_style.texture_margin_bottom = 16
+		# Large margins = ornate corners/edges stay pixel-perfect, only center stretches
+		panel_style.texture_margin_left = 64
+		panel_style.texture_margin_right = 64
+		panel_style.texture_margin_top = 48
+		panel_style.texture_margin_bottom = 48
 		panel_style.content_margin_left = 12
 		panel_style.content_margin_right = 12
 		panel_style.content_margin_top = 8
 		panel_style.content_margin_bottom = 8
 		bottom_panel.add_theme_stylebox_override("panel", panel_style)
 	
-	# Style ESC menu panel
+	# Style ESC menu panel (256x256 — generous margins for all corners)
 	var info_tex = _load_tex("res://assets/sprites/ui/info_frame.png")
 	if info_tex:
 		var esc_style = StyleBoxTexture.new()
 		esc_style.texture = info_tex
-		esc_style.texture_margin_left = 12
-		esc_style.texture_margin_right = 12
-		esc_style.texture_margin_top = 12
-		esc_style.texture_margin_bottom = 12
+		esc_style.texture_margin_left = 48
+		esc_style.texture_margin_right = 48
+		esc_style.texture_margin_top = 48
+		esc_style.texture_margin_bottom = 48
 		esc_style.content_margin_left = 16
 		esc_style.content_margin_right = 16
 		esc_style.content_margin_top = 16
 		esc_style.content_margin_bottom = 16
 		esc_menu.add_theme_stylebox_override("panel", esc_style)
 	
-	# Style top bar background
+	# Style top bar background (512x64 — wide margins for edge details)
 	var topbar_tex = _load_tex("res://assets/sprites/ui/topbar_frame.png")
 	if topbar_tex:
 		var topbar_style = StyleBoxTexture.new()
 		topbar_style.texture = topbar_tex
-		topbar_style.texture_margin_left = 16
-		topbar_style.texture_margin_right = 16
-		topbar_style.texture_margin_top = 8
-		topbar_style.texture_margin_bottom = 8
+		topbar_style.texture_margin_left = 64
+		topbar_style.texture_margin_right = 64
+		topbar_style.texture_margin_top = 24
+		topbar_style.texture_margin_bottom = 24
 		topbar_style.content_margin_left = 12
 		topbar_style.content_margin_right = 12
-		# Wrap top_bar in a panel if needed
+		# Wrap top_bar in a panel
 		if top_bar.get_parent():
 			var top_panel = PanelContainer.new()
 			var parent = top_bar.get_parent()
@@ -123,12 +126,11 @@ func _apply_ui_style():
 			top_panel.add_theme_stylebox_override("panel", topbar_style)
 			parent.add_child(top_panel)
 			parent.move_child(top_panel, idx)
-			# Position it
 			top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
-			top_panel.offset_left = 10
-			top_panel.offset_top = 8
-			top_panel.offset_right = -10
-			top_panel.offset_bottom = 40
+			top_panel.offset_left = 0
+			top_panel.offset_top = 0
+			top_panel.offset_right = 0
+			top_panel.offset_bottom = 44
 			top_panel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	
 	# Style buttons with textures
@@ -152,16 +154,17 @@ func _style_all_buttons():
 		_apply_btn_style(btn, normal_style, hover_style, pressed_style, disabled_style)
 
 func _make_btn_stylebox(tex: Texture2D) -> StyleBoxTexture:
+	# Buttons are 256x64 — use big margins to protect ornate edges
 	var style = StyleBoxTexture.new()
 	style.texture = tex
-	style.texture_margin_left = 8
-	style.texture_margin_right = 8
-	style.texture_margin_top = 6
-	style.texture_margin_bottom = 6
-	style.content_margin_left = 8
-	style.content_margin_right = 8
-	style.content_margin_top = 4
-	style.content_margin_bottom = 4
+	style.texture_margin_left = 24
+	style.texture_margin_right = 24
+	style.texture_margin_top = 16
+	style.texture_margin_bottom = 16
+	style.content_margin_left = 12
+	style.content_margin_right = 12
+	style.content_margin_top = 6
+	style.content_margin_bottom = 6
 	return style
 
 func _apply_btn_style(btn: Button, normal: StyleBoxTexture, hover: StyleBoxTexture, pressed: StyleBoxTexture, disabled: StyleBoxTexture):
