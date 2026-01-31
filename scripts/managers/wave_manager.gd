@@ -83,6 +83,7 @@ func spawn_wave(wave_number: int):
 func _spawn_enemy(type: String):
 	if enemy_scene and path:
 		var follow = PathFollow2D.new()
+		follow.rotates = false  # Don't rotate sprite with path direction
 		path.add_child(follow)
 		var enemy = enemy_scene.instantiate()
 		enemy.setup(type)

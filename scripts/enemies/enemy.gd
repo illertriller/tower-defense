@@ -63,6 +63,24 @@ var sprite_sheets: Dictionary = {
 	"boss": "res://assets/sprites/enemies/demon_lord_walk_sheet.png",
 }
 
+# Default sprite facing direction (true = faces right in the sheet)
+var default_faces_right: Dictionary = {
+	"imp": true,
+	"hell_hound": false,
+	"brute_demon": false,
+	"wraith": false,
+	"fire_elemental": false,
+	"shadow_stalker": true,
+	"bone_golem": false,
+	"succubus": true,
+	"hell_knight": false,
+	"demon_lord": true,
+	"basic": true,
+	"fast": false,
+	"tank": false,
+	"boss": true,
+}
+
 # Animation speeds per type (FPS)
 var anim_speeds: Dictionary = {
 	"imp": 6.0,
@@ -194,14 +212,16 @@ func _process(delta: float):
 		path_follow.progress += speed * slow_multiplier * delta
 		var new_pos = path_follow.global_position
 		
-		# Determine facing direction
+		# Determine facing direction based on movement and sprite's default facing
 		var move_dir = new_pos - prev_pos
+		var faces_right = default_faces_right.get(enemy_type, true)
 		
-		if abs(move_dir.x) > abs(move_dir.y):
-			last_h_facing_right = move_dir.x > 0
-			animated_sprite.flip_h = not last_h_facing_right
-		else:
-			animated_sprite.flip_h = last_h_facing_right
+		if abs(move_dir.x) > 0.5:
+			# Moving horizontally — flip if moving opposite to default facing
+			var moving_right = move_dir.x > 0
+			animated_sprite.flip_h = (moving_right != faces_right)
+			last_h_facing_right = moving_right
+		# When moving vertically, keep the last horizontal flip state
 		
 		# Check if reached the end
 		if path_follow.progress_ratio >= 1.0:
