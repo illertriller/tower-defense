@@ -44,18 +44,19 @@
 | Universal tower script (handles all types) | EDI | ✅ Done |
 | Game economy balancing (costs, rewards) | EDI + Martin | 🔜 Needs testing |
 
-## Phase 3: UI Overhaul
-**Target:** After Phase 2
+## Phase 3: UI Overhaul ⏳
+**Target:** 2026-01-31
 **Goal:** WC3-inspired professional game UI
 
 | Task | Owner | Status |
 |------|-------|--------|
-| Bottom panel UI (tower menu, info, controls) | EDI | Pending |
-| WC3-style UI frame art | Leonard | Pending |
-| In-game ESC menu (resume/settings/restart/quit) | EDI | Pending |
-| Full settings menus (graphics/sound/keys) | EDI | Pending |
-| Tower selection & info panel | EDI | Pending |
-| Level select screen | EDI | ✅ Done (early) |
+| Bottom panel UI (tower menu, info, controls) | EDI | ✅ Done |
+| WC3-style UI frame art | Leonard | ⏳ In progress |
+| In-game ESC menu (resume/settings/restart/quit) | EDI | ✅ Done |
+| Full settings menus (graphics/sound/keys) | EDI | 🔜 Phase 4 |
+| Tower selection & info panel | EDI | ✅ Done |
+| Level select screen | EDI | ✅ Done (Phase 1) |
+| Separated HUD scene (game_hud.tscn) | EDI | ✅ Done |
 
 ## Phase 4: Polish & Juice
 **Target:** Final phase
