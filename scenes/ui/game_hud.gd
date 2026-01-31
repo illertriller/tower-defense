@@ -155,12 +155,18 @@ func _update_tower_info(tower: Node2D):
 		upgrade_container.add_child(btn)
 	
 	# Demolish button — added to info panel directly, outside scroll
-	if demolish_btn:
+	if demolish_btn and is_instance_valid(demolish_btn):
 		demolish_btn.queue_free()
+		demolish_btn = null
 	demolish_btn = Button.new()
 	demolish_btn.custom_minimum_size = Vector2(0, 28)
-	var refund = tower.get_total_value() / 2
-	demolish_btn.text = "🔨 Demolish (+%dg refund)" % refund
+	var refund = 0
+	if tower.has_method("get_total_value"):
+		refund = tower.get_total_value() / 2
+	else:
+		var tdata = GameManager.tower_data.get(tower.tower_type, {})
+		refund = tdata.get("cost", 0) / 2
+	demolish_btn.text = "Demolish (+%dg)" % refund
 	demolish_btn.pressed.connect(func(): demolish_requested.emit())
 	info_panel.add_child(demolish_btn)
 
