@@ -97,14 +97,8 @@ func _style_bottom_panel():
 	bottom_panel.add_theme_stylebox_override("panel", style)
 	
 	# Decorative overlays at native size (no stretching!)
-	_add_decoration(bottom_panel, DECO_PATH + "panel_gem.png",
-		"top_center", Vector2(0, -28))
-	_add_decoration(bottom_panel, DECO_PATH + "panel_corner_ornament.png",
-		"top_left", Vector2(4, -4))
-	_add_decoration(bottom_panel, DECO_PATH + "panel_corner_ornament.png",
-		"top_right", Vector2(-4, -4), true)  # flip_h
-	# Divider line along top (tiled)
-	_add_tiled_decoration(bottom_panel, DECO_PATH + "panel_divider.png", "top")
+	# These are added to the HUD layer directly and positioned over the panel
+	_add_panel_decorations()
 
 func _style_top_bar():
 	if not top_bar.get_parent():
@@ -136,9 +130,46 @@ func _style_top_bar():
 	style.shadow_offset = Vector2(0, 2)
 	top_panel.add_theme_stylebox_override("panel", style)
 	
-	# Emblem decoration
-	_add_decoration(top_panel, DECO_PATH + "topbar_emblem.png",
-		"center_left", Vector2(6, 0))
+	# Emblem decoration on top bar
+	var emblem_tex = _load_tex(DECO_PATH + "topbar_emblem.png")
+	if emblem_tex:
+		var emblem = _make_deco_rect(emblem_tex)
+		add_child(emblem)
+		emblem.position = Vector2(6, (40 - emblem_tex.get_height()) / 2.0)
+
+func _add_panel_decorations():
+	# Place decorations as direct children of a Control overlay on the CanvasLayer
+	# so PanelContainer doesn't force-resize them
+	var vp_size = get_viewport().get_visible_rect().size
+	var panel_top_y = vp_size.y - 175  # bottom panel offset_top
+	
+	# Center gem at top of bottom panel
+	var gem_tex = _load_tex(DECO_PATH + "panel_gem.png")
+	if gem_tex:
+		var gem = _make_deco_rect(gem_tex)
+		add_child(gem)
+		gem.position = Vector2(vp_size.x / 2.0 - gem_tex.get_width() / 2.0, panel_top_y - gem_tex.get_height() / 2.0)
+	
+	# Corner ornaments at top corners of bottom panel
+	var corner_tex = _load_tex(DECO_PATH + "panel_corner_ornament.png")
+	if corner_tex:
+		var left = _make_deco_rect(corner_tex)
+		add_child(left)
+		left.position = Vector2(4, panel_top_y - 4)
+		
+		var right = _make_deco_rect(corner_tex)
+		right.flip_h = true
+		add_child(right)
+		right.position = Vector2(vp_size.x - corner_tex.get_width() - 4, panel_top_y - 4)
+
+func _make_deco_rect(tex: Texture2D) -> TextureRect:
+	var rect = TextureRect.new()
+	rect.texture = tex
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP
+	rect.z_index = 5
+	return rect
 
 func _style_esc_menu():
 	var style = StyleBoxFlat.new()
@@ -151,16 +182,6 @@ func _style_esc_menu():
 	style.shadow_size = 12
 	style.shadow_offset = Vector2(0, 4)
 	esc_menu.add_theme_stylebox_override("panel", style)
-	
-	# Corner ornaments
-	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
-		"top_left", Vector2(-6, -6))
-	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
-		"top_right", Vector2(6, -6), true)
-	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
-		"bottom_left", Vector2(-6, 6), false, true)
-	_add_decoration(esc_menu, DECO_PATH + "esc_menu_ornament.png",
-		"bottom_right", Vector2(6, 6), true, true)
 
 func _style_all_buttons():
 	var normal = _make_flat_btn(UI_BG_LIGHT, UI_GOLD)
@@ -190,70 +211,6 @@ func _load_tex(path: String) -> Texture2D:
 	if ResourceLoader.exists(path):
 		return load(path)
 	return null
-
-func _add_decoration(parent: Control, tex_path: String, anchor: String,
-		offset: Vector2 = Vector2.ZERO, flip_h: bool = false, flip_v: bool = false):
-	var tex = _load_tex(tex_path)
-	if not tex:
-		return
-	
-	var rect = TextureRect.new()
-	rect.texture = tex
-	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.flip_h = flip_h
-	rect.flip_v = flip_v
-	rect.z_index = 5
-	
-	# Size to texture (native, no stretching)
-	rect.stretch_mode = TextureRect.STRETCH_KEEP
-	rect.custom_minimum_size = tex.get_size()
-	rect.size = tex.get_size()
-	
-	parent.add_child(rect)
-	
-	# Position based on anchor point
-	match anchor:
-		"top_center":
-			rect.set_anchors_preset(Control.PRESET_CENTER_TOP)
-			rect.position = Vector2(-tex.get_width() / 2.0, 0) + offset
-		"top_left":
-			rect.set_anchors_preset(Control.PRESET_TOP_LEFT)
-			rect.position = offset
-		"top_right":
-			rect.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-			rect.position = Vector2(-tex.get_width(), 0) + offset
-		"bottom_left":
-			rect.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-			rect.position = Vector2(0, -tex.get_height()) + offset
-		"bottom_right":
-			rect.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-			rect.position = Vector2(-tex.get_width(), -tex.get_height()) + offset
-		"center_left":
-			rect.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-			rect.position = Vector2(0, -tex.get_height() / 2.0) + offset
-
-func _add_tiled_decoration(parent: Control, tex_path: String, edge: String):
-	var tex = _load_tex(tex_path)
-	if not tex:
-		return
-	
-	var rect = TextureRect.new()
-	rect.texture = tex
-	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.stretch_mode = TextureRect.STRETCH_TILE
-	rect.z_index = 4
-	
-	parent.add_child(rect)
-	
-	match edge:
-		"top":
-			rect.set_anchors_preset(Control.PRESET_TOP_WIDE)
-			rect.offset_top = -tex.get_height() / 2.0
-			rect.offset_bottom = tex.get_height() / 2.0
-			rect.offset_left = 60  # Avoid overlapping corner ornaments
-			rect.offset_right = -60
 
 # === TOWER SLOT STYLES ===
 func _make_tower_slot_style(border_color: Color, bg_color: Color) -> StyleBoxFlat:
