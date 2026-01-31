@@ -169,15 +169,26 @@ func _build_tower_buttons():
 		var type = tower_types[i]
 		var data = GameManager.tower_data.get(type, {})
 		
-		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(80, 64)
+		var btn = TextureButton.new()
+		btn.custom_minimum_size = Vector2(56, 56)
+		btn.ignore_texture_size = true
+		btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 		
-		var hotkey = ""
-		if i < 10:
-			hotkey = "[%d]" % ((i + 1) % 10)
+		# Load tower sprite
+		var tex_path = "res://assets/sprites/towers/%s.png" % type
+		if ResourceLoader.exists(tex_path):
+			var tex = load(tex_path)
+			btn.texture_normal = tex
+			btn.texture_hover = tex
+			btn.texture_pressed = tex
 		
-		btn.text = "%s\n%s\n%dg" % [hotkey, data.get("name", type).substr(0, 8), data.get("cost", 0)]
-		btn.tooltip_text = "%s — %s" % [data.get("name", ""), data.get("description", "")]
+		# Hotkey + name + cost in tooltip
+		var hotkey = "[%d] " % ((i + 1) % 10) if i < 10 else ""
+		btn.tooltip_text = "%s%s — %dg\n%s" % [
+			hotkey, data.get("name", type),
+			data.get("cost", 0), data.get("description", "")
+		]
+		
 		btn.pressed.connect(func(): tower_selected.emit(type))
 		tower_grid.add_child(btn)
 
@@ -190,7 +201,9 @@ func update_hud():
 	
 	var buttons = tower_grid.get_children()
 	for i in range(min(buttons.size(), tower_types.size())):
-		buttons[i].disabled = not GameManager.can_afford(tower_types[i])
+		var can = GameManager.can_afford(tower_types[i])
+		buttons[i].modulate = Color(1, 1, 1, 1) if can else Color(0.4, 0.4, 0.4, 0.6)
+		buttons[i].disabled = not can
 	
 	start_wave_btn.disabled = GameManager.is_wave_active
 	
