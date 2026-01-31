@@ -126,6 +126,7 @@ text = "[Space]"
 horizontal_alignment = 1
 
 [node name="EscMenu" type="PanelContainer" parent="."]
+process_mode = 3
 visible = false
 anchors_preset = 8
 anchor_left = 0.5
