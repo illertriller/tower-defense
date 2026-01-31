@@ -25,18 +25,24 @@
 | Wave race condition fix | EDI | ✅ Done |
 | Testing & bug fixes | EDI | 🔜 Next |
 
-## Phase 2: Towers & Combat
-**Target:** Next session(s)
+## Phase 2: Towers & Combat ⏳
+**Target:** 2026-01-31
 **Goal:** Full tower roster with unique mechanics
 
 | Task | Owner | Status |
 |------|-------|--------|
-| 10 new tower types (design + sprites) | Leonard | Pending |
-| Tower mechanics (frost, flame, anti-air, etc.) | EDI | Pending |
-| Flying enemy mechanic (wraith + anti-air) | EDI | Pending |
-| Tower upgrade system (3 paths, 3 levels each) | EDI | Pending |
-| Tower upgrade UI panel | EDI | Pending |
-| Game economy balancing (costs, rewards) | EDI + Martin | Pending |
+| 10 new tower types (design + sprites) | Leonard | ⏳ 5/10 Done |
+| 3 new projectile sprites (frost/poison/holy) | Leonard | ⏳ Pending |
+| Tower mechanics (frost, flame, anti-air, etc.) | EDI | ✅ Done |
+| Flying enemy mechanic (wraith + anti-air) | EDI | ✅ Done |
+| Poison/burn DoT system | EDI | ✅ Done |
+| Splash damage system | EDI | ✅ Done |
+| Holy damage multiplier | EDI | ✅ Done |
+| Gold mine income mechanic | EDI | ✅ Done |
+| Tower upgrade system (3 paths, 3 levels each) | EDI | ✅ Done |
+| Tower upgrade UI panel | EDI | ✅ Done |
+| Universal tower script (handles all types) | EDI | ✅ Done |
+| Game economy balancing (costs, rewards) | EDI + Martin | 🔜 Needs testing |
 
 ## Phase 3: UI Overhaul
 **Target:** After Phase 2
