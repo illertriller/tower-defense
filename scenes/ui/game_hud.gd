@@ -136,7 +136,7 @@ func _update_tower_info(tower: Node2D):
 	for path_key in upgrade_info:
 		var path = upgrade_info[path_key]
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(0, 32)
+		btn.custom_minimum_size = Vector2(0, 26)
 		
 		if path["can_upgrade"]:
 			btn.text = "⬆ %s Lv%d — %dg (%s)" % [
