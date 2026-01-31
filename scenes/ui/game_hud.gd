@@ -55,118 +55,125 @@ func _ready():
 	main_menu_btn.pressed.connect(_on_main_menu)
 	start_wave_btn.pressed.connect(func(): wave_start_requested.emit())
 	
+	# UI textures use linear filtering for smooth scaling
+	# (game world stays on nearest-neighbor for crisp pixel art)
+	_set_ui_linear_filter()
+	
 	_apply_ui_style()
 	_build_tower_buttons()
 	_clear_info_panel()
 
-# === UI COLORS ===
-# Shared palette — dark panels with gold trim, WC3/Diablo vibe
-const UI_BG_DARK = Color(0.08, 0.06, 0.04, 0.92)
-const UI_BG_MID = Color(0.12, 0.09, 0.06, 0.95)
-const UI_GOLD = Color(0.75, 0.60, 0.22)
-const UI_GOLD_BRIGHT = Color(1.0, 0.85, 0.32)
-const UI_GOLD_DIM = Color(0.50, 0.40, 0.15)
-const UI_INNER_BORDER = Color(0.30, 0.24, 0.12, 0.6)
-const UI_SHADOW = Color(0.0, 0.0, 0.0, 0.5)
+func _set_ui_linear_filter():
+	# Apply linear filtering to all UI containers so frame textures
+	# render smooth instead of chunky nearest-neighbor pixels
+	for node in [bottom_panel, esc_menu]:
+		node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	# Top bar gets reparented in _apply_ui_style, so we handle it there
 
-# === UI STYLING — Pure StyleBoxFlat, no stretched textures ===
+# === UI STYLING ===
 func _apply_ui_style():
-	_style_bottom_panel()
-	_style_top_bar()
-	_style_esc_menu()
+	# Style bottom panel with frame texture
+	var panel_tex = _load_tex("res://assets/sprites/ui/panel_frame.png")
+	if panel_tex:
+		var panel_style = StyleBoxTexture.new()
+		panel_style.texture = panel_tex
+		panel_style.texture_margin_left = 16
+		panel_style.texture_margin_right = 16
+		panel_style.texture_margin_top = 16
+		panel_style.texture_margin_bottom = 16
+		panel_style.content_margin_left = 12
+		panel_style.content_margin_right = 12
+		panel_style.content_margin_top = 8
+		panel_style.content_margin_bottom = 8
+		bottom_panel.add_theme_stylebox_override("panel", panel_style)
+	
+	# Style ESC menu panel
+	var info_tex = _load_tex("res://assets/sprites/ui/info_frame.png")
+	if info_tex:
+		var esc_style = StyleBoxTexture.new()
+		esc_style.texture = info_tex
+		esc_style.texture_margin_left = 12
+		esc_style.texture_margin_right = 12
+		esc_style.texture_margin_top = 12
+		esc_style.texture_margin_bottom = 12
+		esc_style.content_margin_left = 16
+		esc_style.content_margin_right = 16
+		esc_style.content_margin_top = 16
+		esc_style.content_margin_bottom = 16
+		esc_menu.add_theme_stylebox_override("panel", esc_style)
+	
+	# Style top bar background
+	var topbar_tex = _load_tex("res://assets/sprites/ui/topbar_frame.png")
+	if topbar_tex:
+		var topbar_style = StyleBoxTexture.new()
+		topbar_style.texture = topbar_tex
+		topbar_style.texture_margin_left = 16
+		topbar_style.texture_margin_right = 16
+		topbar_style.texture_margin_top = 8
+		topbar_style.texture_margin_bottom = 8
+		topbar_style.content_margin_left = 12
+		topbar_style.content_margin_right = 12
+		# Wrap top_bar in a panel if needed
+		if top_bar.get_parent():
+			var top_panel = PanelContainer.new()
+			var parent = top_bar.get_parent()
+			var idx = top_bar.get_index()
+			parent.remove_child(top_bar)
+			top_panel.add_child(top_bar)
+			top_panel.add_theme_stylebox_override("panel", topbar_style)
+			parent.add_child(top_panel)
+			parent.move_child(top_panel, idx)
+			# Position it
+			top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
+			top_panel.offset_left = 10
+			top_panel.offset_top = 8
+			top_panel.offset_right = -10
+			top_panel.offset_bottom = 40
+			top_panel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	
+	# Style buttons with textures
 	_style_all_buttons()
 
-func _style_bottom_panel():
-	var style = StyleBoxFlat.new()
-	style.bg_color = UI_BG_DARK
-	# Gold outer border
-	style.border_color = UI_GOLD
-	style.border_width_top = 3
-	style.border_width_bottom = 2
-	style.border_width_left = 2
-	style.border_width_right = 2
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 0
-	style.corner_radius_bottom_right = 0
-	# Content padding
-	style.content_margin_left = 10
-	style.content_margin_right = 10
-	style.content_margin_top = 8
-	style.content_margin_bottom = 6
-	# Subtle shadow above panel
-	style.shadow_color = UI_SHADOW
-	style.shadow_size = 6
-	style.shadow_offset = Vector2(0, -2)
-	bottom_panel.add_theme_stylebox_override("panel", style)
-
-func _style_top_bar():
-	if not top_bar.get_parent():
-		return
-	var top_panel = PanelContainer.new()
-	var parent = top_bar.get_parent()
-	var idx = top_bar.get_index()
-	parent.remove_child(top_bar)
-	top_panel.add_child(top_bar)
-	parent.add_child(top_panel)
-	parent.move_child(top_panel, idx)
-	
-	top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	top_panel.offset_left = 0
-	top_panel.offset_top = 0
-	top_panel.offset_right = 0
-	top_panel.offset_bottom = 40
-	
-	var style = StyleBoxFlat.new()
-	style.bg_color = UI_BG_DARK
-	style.border_color = UI_GOLD
-	style.border_width_bottom = 2
-	style.border_width_left = 0
-	style.border_width_right = 0
-	style.border_width_top = 0
-	style.content_margin_left = 16
-	style.content_margin_right = 16
-	style.content_margin_top = 6
-	style.content_margin_bottom = 6
-	style.shadow_color = UI_SHADOW
-	style.shadow_size = 4
-	style.shadow_offset = Vector2(0, 2)
-	top_panel.add_theme_stylebox_override("panel", style)
-
-func _style_esc_menu():
-	var style = StyleBoxFlat.new()
-	style.bg_color = UI_BG_MID
-	style.border_color = UI_GOLD
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(6)
-	style.set_content_margin_all(20)
-	# Drop shadow
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
-	style.shadow_size = 12
-	style.shadow_offset = Vector2(0, 4)
-	esc_menu.add_theme_stylebox_override("panel", style)
-
 func _style_all_buttons():
-	var normal = _make_ui_btn_style(UI_BG_MID, UI_GOLD)
-	var hover = _make_ui_btn_style(Color(0.16, 0.12, 0.08, 0.95), UI_GOLD_BRIGHT)
-	var pressed = _make_ui_btn_style(Color(0.06, 0.04, 0.02, 0.95), UI_GOLD)
-	var disabled = _make_ui_btn_style(Color(0.08, 0.07, 0.06, 0.7), UI_GOLD_DIM)
+	var btn_normal = _load_tex("res://assets/sprites/ui/button_normal.png")
+	var btn_hover = _load_tex("res://assets/sprites/ui/button_hover.png")
+	var btn_pressed = _load_tex("res://assets/sprites/ui/button_pressed.png")
+	if not btn_normal:
+		return
 	
+	var normal_style = _make_btn_stylebox(btn_normal)
+	var hover_style = _make_btn_stylebox(btn_hover if btn_hover else btn_normal)
+	var pressed_style = _make_btn_stylebox(btn_pressed if btn_pressed else btn_normal)
+	var disabled_style = _make_btn_stylebox(btn_normal)
+	disabled_style.modulate_color = Color(0.5, 0.5, 0.5, 0.7)
+	
+	# Apply to specific buttons
 	for btn in [resume_btn, restart_btn, settings_btn, main_menu_btn, start_wave_btn]:
-		btn.add_theme_stylebox_override("normal", normal)
-		btn.add_theme_stylebox_override("hover", hover)
-		btn.add_theme_stylebox_override("pressed", pressed)
-		btn.add_theme_stylebox_override("disabled", disabled)
-		btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		_apply_btn_style(btn, normal_style, hover_style, pressed_style, disabled_style)
 
-func _make_ui_btn_style(bg: Color, border: Color) -> StyleBoxFlat:
-	var style = StyleBoxFlat.new()
-	style.bg_color = bg
-	style.border_color = border
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(3)
-	style.set_content_margin_all(6)
+func _make_btn_stylebox(tex: Texture2D) -> StyleBoxTexture:
+	var style = StyleBoxTexture.new()
+	style.texture = tex
+	style.texture_margin_left = 8
+	style.texture_margin_right = 8
+	style.texture_margin_top = 6
+	style.texture_margin_bottom = 6
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
 	return style
+
+func _apply_btn_style(btn: Button, normal: StyleBoxTexture, hover: StyleBoxTexture, pressed: StyleBoxTexture, disabled: StyleBoxTexture):
+	btn.add_theme_stylebox_override("normal", normal)
+	btn.add_theme_stylebox_override("hover", hover)
+	btn.add_theme_stylebox_override("pressed", pressed)
+	btn.add_theme_stylebox_override("disabled", disabled)
+
+func _load_tex(path: String) -> Texture2D:
+	if ResourceLoader.exists(path):
+		return load(path)
+	return null
 
 # === TOWER SLOT STYLES ===
 func _make_tower_slot_style(border_color: Color, bg_color: Color) -> StyleBoxFlat:

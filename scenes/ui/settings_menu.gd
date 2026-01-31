@@ -13,7 +13,6 @@ signal closed()
 @onready var back_btn: Button = $Panel/VBox/BackBtn
 
 func _ready():
-	_style_panel()
 	_populate_options()
 	_load_current()
 	
@@ -23,34 +22,6 @@ func _ready():
 	edge_pan_check.toggled.connect(_on_edge_pan_toggled)
 	minimap_check.toggled.connect(_on_minimap_toggled)
 	back_btn.pressed.connect(_on_back)
-
-func _style_panel():
-	var panel = $Panel
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.10, 0.08, 0.05, 0.95)
-	style.border_color = Color(0.75, 0.60, 0.22)
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(6)
-	style.set_content_margin_all(20)
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
-	style.shadow_size = 12
-	style.shadow_offset = Vector2(0, 4)
-	panel.add_theme_stylebox_override("panel", style)
-	
-	# Style the back button
-	var btn_style = StyleBoxFlat.new()
-	btn_style.bg_color = Color(0.12, 0.09, 0.06, 0.95)
-	btn_style.border_color = Color(0.75, 0.60, 0.22)
-	btn_style.set_border_width_all(2)
-	btn_style.set_corner_radius_all(3)
-	btn_style.set_content_margin_all(6)
-	back_btn.add_theme_stylebox_override("normal", btn_style)
-	
-	var hover_style = btn_style.duplicate()
-	hover_style.border_color = Color(1.0, 0.85, 0.32)
-	hover_style.bg_color = Color(0.16, 0.12, 0.08, 0.95)
-	back_btn.add_theme_stylebox_override("hover", hover_style)
-	back_btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 
 func _populate_options():
 	resolution_option.clear()
