@@ -90,8 +90,8 @@ vertical_scroll_mode = 0
 
 [node name="TowerGrid" type="GridContainer" parent="BottomPanel/HBox/TowerMenu/ScrollContainer"]
 layout_mode = 2
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 columns = 7
 
 [node name="InfoPanel" type="VBoxContainer" parent="BottomPanel/HBox"]

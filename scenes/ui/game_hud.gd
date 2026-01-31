@@ -163,27 +163,66 @@ func _load_tex(path: String) -> Texture2D:
 		return load(path)
 	return null
 
+# === TOWER SLOT STYLES ===
+func _make_tower_slot_style(border_color: Color, bg_color: Color) -> StyleBoxFlat:
+	var style = StyleBoxFlat.new()
+	style.bg_color = bg_color
+	style.border_color = border_color
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(3)
+	style.set_content_margin_all(5)
+	return style
+
+var _slot_normal: StyleBoxFlat
+var _slot_hover: StyleBoxFlat
+var _slot_pressed: StyleBoxFlat
+var _slot_disabled: StyleBoxFlat
+
+func _init_tower_slot_styles():
+	# Normal — dark background, warm gold border
+	_slot_normal = _make_tower_slot_style(
+		Color(0.70, 0.55, 0.20), Color(0.12, 0.10, 0.08, 0.9))
+	# Hover — brighter gold, slightly lighter bg
+	_slot_hover = _make_tower_slot_style(
+		Color(1.0, 0.85, 0.30), Color(0.18, 0.15, 0.10, 0.95))
+	# Pressed — inset feel
+	_slot_pressed = _make_tower_slot_style(
+		Color(0.90, 0.70, 0.20), Color(0.08, 0.06, 0.04, 0.95))
+	# Disabled — dim
+	_slot_disabled = _make_tower_slot_style(
+		Color(0.35, 0.30, 0.15, 0.5), Color(0.08, 0.07, 0.06, 0.7))
+
 # === TOWER BUTTONS ===
 func _build_tower_buttons():
 	for child in tower_grid.get_children():
 		child.queue_free()
 	
+	_init_tower_slot_styles()
+	
 	for i in range(tower_types.size()):
 		var type = tower_types[i]
 		var data = GameManager.tower_data.get(type, {})
 		
-		var btn = TextureButton.new()
-		btn.custom_minimum_size = Vector2(56, 56)
-		btn.ignore_texture_size = true
-		btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		# Styled button with gold border
+		var btn = Button.new()
+		btn.custom_minimum_size = Vector2(68, 68)
+		btn.text = ""
+		btn.add_theme_stylebox_override("normal", _slot_normal)
+		btn.add_theme_stylebox_override("hover", _slot_hover)
+		btn.add_theme_stylebox_override("pressed", _slot_pressed)
+		btn.add_theme_stylebox_override("disabled", _slot_disabled)
+		btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 		
-		# Load tower sprite
+		# Tower sprite inside the button
 		var tex_path = "res://assets/sprites/towers/%s.png" % type
 		if ResourceLoader.exists(tex_path):
-			var tex = load(tex_path)
-			btn.texture_normal = tex
-			btn.texture_hover = tex
-			btn.texture_pressed = tex
+			var icon = TextureRect.new()
+			icon.texture = load(tex_path)
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+			icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			btn.add_child(icon)
 		
 		# Hotkey + name + cost in tooltip
 		var hotkey = "[%d] " % ((i + 1) % 10) if i < 10 else ""
