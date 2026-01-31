@@ -32,7 +32,6 @@ var camera_edge_pan: bool = true
 var camera_edge_speed: float = 600.0
 var camera_keyboard_speed: float = 800.0
 var camera_edge_margin: int = 30  # pixels from screen edge to start panning
-var show_grid: bool = true
 var show_minimap: bool = true
 
 # Computed properties
@@ -104,7 +103,6 @@ func save_settings():
 		"camera_edge_pan": camera_edge_pan,
 		"camera_edge_speed": camera_edge_speed,
 		"camera_keyboard_speed": camera_keyboard_speed,
-		"show_grid": show_grid,
 		"show_minimap": show_minimap,
 	}
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -131,5 +129,4 @@ func load_settings():
 	camera_edge_pan = data.get("camera_edge_pan", true)
 	camera_edge_speed = data.get("camera_edge_speed", 600.0)
 	camera_keyboard_speed = data.get("camera_keyboard_speed", 800.0)
-	show_grid = data.get("show_grid", true)
 	show_minimap = data.get("show_minimap", true)

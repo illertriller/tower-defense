@@ -105,18 +105,6 @@ text = "Edge Panning"
 [node name="CheckButton" type="CheckButton" parent="Panel/VBox/EdgePanRow"]
 layout_mode = 2
 
-[node name="GridRow" type="HBoxContainer" parent="Panel/VBox"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Panel/VBox/GridRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-label_settings = SubResource("LabelSettings_label")
-text = "Show Grid"
-
-[node name="CheckButton" type="CheckButton" parent="Panel/VBox/GridRow"]
-layout_mode = 2
-
 [node name="MinimapRow" type="HBoxContainer" parent="Panel/VBox"]
 layout_mode = 2
 

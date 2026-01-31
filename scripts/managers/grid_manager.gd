@@ -22,6 +22,9 @@ enum CellState {
 # 2D grid array - stores CellState for each cell
 var grid: Array = []
 
+# Grid visibility — only show while placing towers
+var grid_visible: bool = false
+
 func _ready():
 	_init_grid()
 
@@ -39,39 +42,28 @@ func _init_grid():
 			column.append(CellState.EMPTY)
 		grid.append(column)
 
+func set_grid_visible(visible: bool):
+	grid_visible = visible
+	queue_redraw()
+
 func _draw():
-	if not Settings.show_grid:
+	if not grid_visible:
 		return
 	
-	# Draw subtle grid lines
+	# Draw grid lines across the full map
 	var grid_color = Color(1, 1, 1, 0.08)
-	
-	# Only draw grid lines within the visible camera area for performance
-	var cam = get_viewport().get_camera_2d()
-	var vp_size = get_viewport_rect().size
-	var top_left = Vector2.ZERO
-	var bottom_right = Vector2(grid_width * CELL_SIZE, grid_height * CELL_SIZE)
-	
-	if cam:
-		var zoom = cam.zoom
-		top_left = cam.position - vp_size / (2.0 * zoom)
-		bottom_right = cam.position + vp_size / (2.0 * zoom)
-	
-	# Clamp to grid bounds
-	var start_x = max(0, int(top_left.x / CELL_SIZE))
-	var end_x = min(grid_width, int(bottom_right.x / CELL_SIZE) + 1)
-	var start_y = max(0, int(top_left.y / CELL_SIZE))
-	var end_y = min(grid_height, int(bottom_right.y / CELL_SIZE) + 1)
+	var total_w = grid_width * CELL_SIZE
+	var total_h = grid_height * CELL_SIZE
 	
 	# Vertical lines
-	for x in range(start_x, end_x + 1):
+	for x in range(grid_width + 1):
 		var px = x * CELL_SIZE
-		draw_line(Vector2(px, start_y * CELL_SIZE), Vector2(px, end_y * CELL_SIZE), grid_color, 1.0)
+		draw_line(Vector2(px, 0), Vector2(px, total_h), grid_color, 1.0)
 	
 	# Horizontal lines
-	for y in range(start_y, end_y + 1):
+	for y in range(grid_height + 1):
 		var py = y * CELL_SIZE
-		draw_line(Vector2(start_x * CELL_SIZE, py), Vector2(end_x * CELL_SIZE, py), grid_color, 1.0)
+		draw_line(Vector2(0, py), Vector2(total_w, py), grid_color, 1.0)
 
 # Convert world position to grid coordinates
 func world_to_grid(world_pos: Vector2) -> Vector2i:

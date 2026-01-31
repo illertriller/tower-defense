@@ -110,6 +110,7 @@ func _on_hud_tower_selected(type: String):
 	if GameManager.can_afford(type):
 		selected_tower = type
 		is_placing = true
+		grid_manager.set_grid_visible(true)
 		hud.show_tower_info(type)
 
 func _on_hud_upgrade_requested(path: String):
@@ -132,6 +133,7 @@ func _deselect_all():
 	is_placing = false
 	selected_tower = ""
 	selected_placed_tower = null
+	grid_manager.set_grid_visible(false)
 	hud.clear_placed_tower()
 
 func _unhandled_input(event: InputEvent):
@@ -175,6 +177,7 @@ func _place_tower(world_pos: Vector2):
 	
 	is_placing = false
 	selected_tower = ""
+	grid_manager.set_grid_visible(false)
 	hud.update_hud()
 
 func _try_select_placed_tower(world_pos: Vector2):
