@@ -42,8 +42,8 @@ func _init_grid():
 			column.append(CellState.EMPTY)
 		grid.append(column)
 
-func set_grid_visible(visible: bool):
-	grid_visible = visible
+func set_grid_visible(is_visible: bool):
+	grid_visible = is_visible
 	queue_redraw()
 
 func _draw():

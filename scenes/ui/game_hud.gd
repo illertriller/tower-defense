@@ -55,10 +55,6 @@ func _ready():
 	main_menu_btn.pressed.connect(_on_main_menu)
 	start_wave_btn.pressed.connect(func(): wave_start_requested.emit())
 	
-	# UI textures use linear filtering for smooth scaling
-	# (game world stays on nearest-neighbor for crisp pixel art)
-	_set_ui_linear_filter()
-	
 	_apply_ui_style()
 	_build_tower_buttons()
 	_clear_info_panel()

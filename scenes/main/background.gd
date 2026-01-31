@@ -162,7 +162,6 @@ func _make_decoration(level: int, rng: RandomNumberGenerator, pos: Vector2, them
 						"color": Color(0.25, 0.2, 0.2)}
 		_:
 			return {}
-	return {}
 
 func _near_path(pos: Vector2, path_points: PackedVector2Array, min_dist: float) -> bool:
 	for i in range(path_points.size() - 1):
