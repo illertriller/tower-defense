@@ -22,6 +22,7 @@ signal wave_start_requested()
 @onready var info_stats: Label = $BottomPanel/HBox/InfoPanel/Stats
 @onready var info_desc: Label = $BottomPanel/HBox/InfoPanel/Desc
 @onready var upgrade_container: VBoxContainer = $BottomPanel/HBox/InfoPanel/UpgradeScroll/Upgrades
+var demolish_btn: Button = null
 @onready var controls_container: VBoxContainer = $BottomPanel/HBox/Controls
 
 # ESC menu
@@ -153,13 +154,15 @@ func _update_tower_info(tower: Node2D):
 		
 		upgrade_container.add_child(btn)
 	
-	# Demolish button
+	# Demolish button — added to info panel directly, outside scroll
+	if demolish_btn:
+		demolish_btn.queue_free()
+	demolish_btn = Button.new()
+	demolish_btn.custom_minimum_size = Vector2(0, 28)
 	var refund = tower.get_total_value() / 2
-	var demolish_btn = Button.new()
-	demolish_btn.custom_minimum_size = Vector2(0, 32)
 	demolish_btn.text = "🔨 Demolish (+%dg refund)" % refund
 	demolish_btn.pressed.connect(func(): demolish_requested.emit())
-	upgrade_container.add_child(demolish_btn)
+	info_panel.add_child(demolish_btn)
 
 func clear_placed_tower():
 	_selected_placed_tower = null
@@ -171,6 +174,9 @@ func _clear_info_panel():
 	info_desc.text = "or click a placed tower to upgrade"
 	for child in upgrade_container.get_children():
 		child.queue_free()
+	if demolish_btn:
+		demolish_btn.queue_free()
+		demolish_btn = null
 
 # ESC Menu
 func toggle_esc_menu():
