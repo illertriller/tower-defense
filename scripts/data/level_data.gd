@@ -11,6 +11,51 @@ class_name LevelData
 static func get_level_count() -> int:
 	return 5
 
+static func get_terrain_theme(level: int) -> Dictionary:
+	match level:
+		1: # The Valley — lush green meadow
+			return {
+				"grass": Color(0.28, 0.55, 0.22),
+				"grass_var": Color(0.22, 0.45, 0.17),
+				"road": Color(0.55, 0.43, 0.28),
+				"road_edge": Color(0.35, 0.26, 0.15),
+				"road_center": Color(0.50, 0.40, 0.26),
+			}
+		2: # The Crossing — golden autumn fields
+			return {
+				"grass": Color(0.62, 0.55, 0.25),
+				"grass_var": Color(0.52, 0.44, 0.18),
+				"road": Color(0.50, 0.45, 0.35),
+				"road_edge": Color(0.35, 0.30, 0.20),
+				"road_center": Color(0.46, 0.42, 0.32),
+			}
+		3: # The Spiral — dark mossy cavern
+			return {
+				"grass": Color(0.16, 0.32, 0.20),
+				"grass_var": Color(0.10, 0.22, 0.14),
+				"road": Color(0.38, 0.36, 0.30),
+				"road_edge": Color(0.22, 0.20, 0.16),
+				"road_center": Color(0.34, 0.32, 0.27),
+			}
+		4: # The Serpent — scorched desert
+			return {
+				"grass": Color(0.72, 0.62, 0.38),
+				"grass_var": Color(0.62, 0.52, 0.30),
+				"road": Color(0.60, 0.48, 0.32),
+				"road_edge": Color(0.45, 0.34, 0.22),
+				"road_center": Color(0.56, 0.44, 0.30),
+			}
+		5: # The Gauntlet — volcanic ashlands
+			return {
+				"grass": Color(0.28, 0.22, 0.22),
+				"grass_var": Color(0.18, 0.13, 0.13),
+				"road": Color(0.35, 0.26, 0.24),
+				"road_edge": Color(0.18, 0.10, 0.08),
+				"road_center": Color(0.32, 0.24, 0.22),
+			}
+		_:
+			return get_terrain_theme(1)
+
 static func get_level_name(level: int) -> String:
 	var names = {
 		1: "The Valley",

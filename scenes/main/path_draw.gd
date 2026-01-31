@@ -1,20 +1,21 @@
 extends Path2D
 
-## Draws the enemy path as a textured gravel road
+## Draws the enemy path as a smooth, natural-looking dirt road
+## PRD: "Dirt road layered on top, following path but looking natural"
+## No tile stamping — uses thick antialiased lines with rounded joins
 
-var gravel_texture: Texture2D
 var path_width: float = 48.0
+var edge_width: float = 56.0
+
+var road_color: Color
+var edge_color: Color
+var center_color: Color
 
 func _ready():
-	# Try level-specific path texture first, fallback to default
-	var level = GameManager.current_level
-	var level_path = "res://assets/sprites/terrain/level%d_path.png" % level
-	
-	if ResourceLoader.exists(level_path):
-		gravel_texture = load(level_path)
-	else:
-		gravel_texture = load("res://assets/sprites/terrain/gravel_tile.png")
-	
+	var theme = LevelData.get_terrain_theme(GameManager.current_level)
+	road_color = theme.road
+	edge_color = theme.road_edge
+	center_color = theme.road_center
 	queue_redraw()
 
 func _draw():
@@ -22,36 +23,24 @@ func _draw():
 		return
 	
 	var points = curve.get_baked_points()
+	if points.size() < 2:
+		return
 	
-	# Draw dark border (road edge)
+	# Layer 1: Road edge / border (darkest, widest)
+	_draw_road_layer(points, edge_color, edge_width)
+	
+	# Layer 2: Main road fill
+	_draw_road_layer(points, road_color, path_width)
+	
+	# Layer 3: Subtle worn center track
+	_draw_road_layer(points, center_color, 6.0)
+
+func _draw_road_layer(points: PackedVector2Array, color: Color, width: float):
+	# Draw line segments
 	for i in range(points.size() - 1):
-		draw_line(points[i], points[i + 1], Color(0.25, 0.2, 0.12), path_width + 6.0)
+		draw_line(points[i], points[i + 1], color, width, true)
 	
-	# Draw the gravel road by tiling texture along the path
-	if gravel_texture:
-		var tile_size = gravel_texture.get_width()
-		# Draw textured quads along the path
-		for i in range(points.size() - 1):
-			var p1 = points[i]
-			var p2 = points[i + 1]
-			var direction = (p2 - p1).normalized()
-			var perpendicular = Vector2(-direction.y, direction.x)
-			var half_w = path_width / 2.0
-			
-			# Draw segment as textured rect
-			var segment_length = p1.distance_to(p2)
-			var steps = int(segment_length / tile_size) + 1
-			
-			for s in range(steps):
-				var t = float(s) / max(steps, 1)
-				var pos = p1.lerp(p2, t)
-				var rect_pos = pos - Vector2(tile_size / 2.0, tile_size / 2.0)
-				draw_texture(gravel_texture, rect_pos)
-	else:
-		# Fallback: solid color road
-		for i in range(points.size() - 1):
-			draw_line(points[i], points[i + 1], Color(0.55, 0.47, 0.31), path_width)
-	
-	# Draw subtle center line (worn track marks)
-	for i in range(points.size() - 1):
-		draw_line(points[i], points[i + 1], Color(0.5, 0.42, 0.28, 0.3), 4.0)
+	# Draw circles at each point for smooth rounded joins
+	var radius = width / 2.0
+	for point in points:
+		draw_circle(point, radius, color)
