@@ -55,9 +55,20 @@ func _ready():
 	main_menu_btn.pressed.connect(_on_main_menu)
 	start_wave_btn.pressed.connect(func(): wave_start_requested.emit())
 	
+	# UI textures use linear filtering for smooth scaling
+	# (game world stays on nearest-neighbor for crisp pixel art)
+	_set_ui_linear_filter()
+	
 	_apply_ui_style()
 	_build_tower_buttons()
 	_clear_info_panel()
+
+func _set_ui_linear_filter():
+	# Apply linear filtering to all UI containers so frame textures
+	# render smooth instead of chunky nearest-neighbor pixels
+	for node in [bottom_panel, esc_menu]:
+		node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	# Top bar gets reparented in _apply_ui_style, so we handle it there
 
 # === UI STYLING ===
 func _apply_ui_style():
@@ -118,6 +129,7 @@ func _apply_ui_style():
 			top_panel.offset_top = 8
 			top_panel.offset_right = -10
 			top_panel.offset_bottom = 40
+			top_panel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	
 	# Style buttons with textures
 	_style_all_buttons()
