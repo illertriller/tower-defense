@@ -68,91 +68,93 @@ static func get_path_points(level: int) -> PackedVector2Array:
 	# Map size: 2560x1440
 	# Grid: 80 x 45 cells (32px each)
 	# Paths use the full map — much longer routes for bigger strategy
+	# ALL coordinates must be cell centers: n*32 + 16
+	# This ensures the road sits cleanly on the grid
 	match level:
 		1:
 			# The Valley — gentle S-curve across the map, good intro
 			# Enters left, sweeps through wide open spaces
 			return PackedVector2Array([
-				Vector2(-48, 400),
-				Vector2(336, 400),
-				Vector2(336, 800),
-				Vector2(816, 800),
-				Vector2(816, 240),
-				Vector2(1360, 240),
-				Vector2(1360, 960),
-				Vector2(1904, 960),
-				Vector2(1904, 400),
-				Vector2(2608, 400)
+				Vector2(-48, 400),       # entry
+				Vector2(336, 400),       # 10, 12
+				Vector2(336, 816),       # 10, 25
+				Vector2(816, 816),       # 25, 25
+				Vector2(816, 240),       # 25, 7
+				Vector2(1360, 240),      # 42, 7
+				Vector2(1360, 976),      # 42, 30
+				Vector2(1904, 976),      # 59, 30
+				Vector2(1904, 400),      # 59, 12
+				Vector2(2608, 400)       # exit
 			])
 		2:
 			# The Crossing — enters top-left, zigzags down then across
 			# Longer path with more bends
 			return PackedVector2Array([
-				Vector2(-48, 208),
-				Vector2(400, 208),
-				Vector2(400, 720),
-				Vector2(880, 720),
-				Vector2(880, 208),
-				Vector2(1360, 208),
-				Vector2(1360, 1040),
-				Vector2(1840, 1040),
-				Vector2(1840, 480),
-				Vector2(2608, 480)
+				Vector2(-48, 208),       # entry
+				Vector2(400, 208),       # 12, 6
+				Vector2(400, 720),       # 12, 22
+				Vector2(880, 720),       # 27, 22
+				Vector2(880, 208),       # 27, 6
+				Vector2(1360, 208),      # 42, 6
+				Vector2(1360, 1040),     # 42, 32
+				Vector2(1840, 1040),     # 57, 32
+				Vector2(1840, 480),      # 57, 14
+				Vector2(2608, 480)       # exit
 			])
 		3:
 			# The Spiral — massive clockwise spiral, enters left exits right
 			# Uses the full map space for a grand sweeping spiral
 			return PackedVector2Array([
-				Vector2(-48, 720),
-				Vector2(240, 720),
-				Vector2(240, 160),
-				Vector2(2320, 160),
-				Vector2(2320, 1280),
-				Vector2(560, 1280),
-				Vector2(560, 480),
-				Vector2(1840, 480),
-				Vector2(1840, 960),
-				Vector2(880, 960),
-				Vector2(880, 640),
-				Vector2(1520, 640),
-				Vector2(1520, 800),
-				Vector2(2608, 800)
+				Vector2(-48, 720),       # entry
+				Vector2(240, 720),       # 7, 22
+				Vector2(240, 176),       # 7, 5
+				Vector2(2320, 176),      # 72, 5
+				Vector2(2320, 1296),     # 72, 40
+				Vector2(560, 1296),      # 17, 40
+				Vector2(560, 496),       # 17, 15
+				Vector2(1840, 496),      # 57, 15
+				Vector2(1840, 976),      # 57, 30
+				Vector2(880, 976),       # 27, 30
+				Vector2(880, 656),       # 27, 20
+				Vector2(1520, 656),      # 47, 20
+				Vector2(1520, 816),      # 47, 25
+				Vector2(2608, 816)       # exit
 			])
 		4:
 			# The Serpent — tight zigzag across the whole map
 			# Maximum path length through narrow corridors
 			return PackedVector2Array([
-				Vector2(-48, 160),
-				Vector2(480, 160),
-				Vector2(480, 1280),
-				Vector2(960, 1280),
-				Vector2(960, 160),
-				Vector2(1440, 160),
-				Vector2(1440, 1280),
-				Vector2(1920, 1280),
-				Vector2(1920, 160),
-				Vector2(2608, 160)
+				Vector2(-48, 176),       # entry
+				Vector2(496, 176),       # 15, 5
+				Vector2(496, 1296),      # 15, 40
+				Vector2(976, 1296),      # 30, 40
+				Vector2(976, 176),       # 30, 5
+				Vector2(1456, 176),      # 45, 5
+				Vector2(1456, 1296),     # 45, 40
+				Vector2(1936, 1296),     # 60, 40
+				Vector2(1936, 176),      # 60, 5
+				Vector2(2608, 176)       # exit
 			])
 		5:
 			# The Gauntlet — maximum complexity, uses every corner
 			# The ultimate maze with switchbacks and loops
 			return PackedVector2Array([
-				Vector2(-48, 336),
-				Vector2(368, 336),
-				Vector2(368, 1200),
-				Vector2(720, 1200),
-				Vector2(720, 240),
-				Vector2(1120, 240),
-				Vector2(1120, 880),
-				Vector2(800, 880),
-				Vector2(800, 560),
-				Vector2(1440, 560),
-				Vector2(1440, 1200),
-				Vector2(1840, 1200),
-				Vector2(1840, 336),
-				Vector2(2160, 336),
-				Vector2(2160, 1040),
-				Vector2(2608, 1040)
+				Vector2(-48, 336),       # entry
+				Vector2(368, 336),       # 11, 10
+				Vector2(368, 1200),      # 11, 37
+				Vector2(720, 1200),      # 22, 37
+				Vector2(720, 240),       # 22, 7
+				Vector2(1136, 240),      # 35, 7
+				Vector2(1136, 880),      # 35, 27
+				Vector2(816, 880),       # 25, 27
+				Vector2(816, 560),       # 25, 17
+				Vector2(1456, 560),      # 45, 17
+				Vector2(1456, 1200),     # 45, 37
+				Vector2(1840, 1200),     # 57, 37
+				Vector2(1840, 336),      # 57, 10
+				Vector2(2160, 336),      # 67, 10
+				Vector2(2160, 1040),     # 67, 32
+				Vector2(2608, 1040)      # exit
 			])
 		_:
 			return get_path_points(1)  # fallback
