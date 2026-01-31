@@ -7,6 +7,8 @@ extends Control
 
 func _ready():
 	back_btn.pressed.connect(_on_back_pressed)
+	# Load saved progress
+	GameManager.max_level_unlocked = max(GameManager.max_level_unlocked, SaveManager.load_progress())
 	_create_level_buttons()
 
 func _create_level_buttons():
@@ -19,6 +21,10 @@ func _create_level_buttons():
 		if level > GameManager.max_level_unlocked:
 			btn.disabled = true
 			btn.text += "\n🔒"
+		else:
+			var best = SaveManager.get_highscore(level)
+			if best.has("score"):
+				btn.text += "\n★ %d" % best["score"]
 		
 		btn.pressed.connect(_on_level_pressed.bind(level))
 		grid.add_child(btn)

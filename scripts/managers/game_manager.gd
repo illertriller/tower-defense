@@ -584,6 +584,9 @@ func _on_level_complete():
 	if current_level >= max_level_unlocked:
 		max_level_unlocked = min(current_level + 1, 5)
 	game_active = false
+	# Save highscore and progress
+	SaveManager.save_highscore(current_level, get_score())
+	SaveManager.save_progress(max_level_unlocked)
 	level_complete.emit(current_level)
 
 func start_level(level: int):

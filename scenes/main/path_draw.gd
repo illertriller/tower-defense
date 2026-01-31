@@ -6,7 +6,15 @@ var gravel_texture: Texture2D
 var path_width: float = 48.0
 
 func _ready():
-	gravel_texture = load("res://assets/sprites/terrain/gravel_tile.png")
+	# Try level-specific path texture first, fallback to default
+	var level = GameManager.current_level
+	var level_path = "res://assets/sprites/terrain/level%d_path.png" % level
+	
+	if ResourceLoader.exists(level_path):
+		gravel_texture = load(level_path)
+	else:
+		gravel_texture = load("res://assets/sprites/terrain/gravel_tile.png")
+	
 	queue_redraw()
 
 func _draw():

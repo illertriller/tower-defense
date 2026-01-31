@@ -260,11 +260,13 @@ func _zap():
 	for target in targets:
 		if is_instance_valid(target) and target.has_method("take_damage"):
 			target.take_damage(damage)
+			GameParticles.spawn_frost_hit(get_tree(), target.global_position)  # Electric spark
 
 # === AOE (Flame Tower) ===
 func _aoe_damage():
 	can_shoot = false
 	shoot_timer.start()
+	GameParticles.spawn_fire_burst(get_tree(), global_position)
 	var targets = _get_valid_targets()
 	for target in targets:
 		if is_instance_valid(target) and target.has_method("take_damage"):

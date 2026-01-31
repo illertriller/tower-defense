@@ -1,11 +1,19 @@
 extends Node2D
 
-## Draws tiled grass background
+## Draws tiled grass background — uses level-specific terrain themes
 
 var grass_texture: Texture2D
 
 func _ready():
-	grass_texture = load("res://assets/sprites/terrain/grass_tile.png")
+	# Try level-specific terrain first, fallback to default
+	var level = GameManager.current_level
+	var level_grass = "res://assets/sprites/terrain/level%d_grass.png" % level
+	
+	if ResourceLoader.exists(level_grass):
+		grass_texture = load(level_grass)
+	else:
+		grass_texture = load("res://assets/sprites/terrain/grass_tile.png")
+	
 	queue_redraw()
 
 func _draw():

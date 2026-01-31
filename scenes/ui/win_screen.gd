@@ -25,6 +25,13 @@ func _show_score():
 	title_label.text = "VICTORY!"
 	
 	var time_str = "%d:%02d" % [int(score["time_seconds"]) / 60, int(score["time_seconds"]) % 60]
+	var best = SaveManager.get_highscore(score["level"])
+	var best_str = ""
+	if best.has("score"):
+		best_str = "\n★ Best: %d" % best["score"]
+		if score["score"] >= best.get("score", 0):
+			best_str = "\n★ NEW HIGH SCORE! ★"
+	
 	stats_label.text = """Level %d — %s
 
 Lives Remaining: %d
@@ -32,25 +39,30 @@ Enemies Killed: %d
 Gold Earned: %d
 Time: %s
 
-SCORE: %d""" % [
+SCORE: %d%s""" % [
 		score["level"], level_name,
 		score["lives_remaining"],
 		score["enemies_killed"],
 		score["gold_earned"],
 		time_str,
-		score["score"]
+		score["score"],
+		best_str
 	]
 	
-	# Hide "Next Level" button if this was the last level
+	# Show credits button if this was the last level
 	if score["level"] >= 5:
-		next_btn.text = "You beat them all!"
-		next_btn.disabled = true
+		next_btn.text = "Watch Credits"
+		next_btn.pressed.disconnect(_on_next_pressed)
+		next_btn.pressed.connect(_on_credits)
 
 func _on_next_pressed():
 	var next_level = GameManager.current_level + 1
 	if next_level <= 5:
 		GameManager.start_level(next_level)
 		get_tree().change_scene_to_file("res://scenes/main/main.tscn")
+
+func _on_credits():
+	get_tree().change_scene_to_file("res://scenes/ui/credits.tscn")
 
 func _on_menu_pressed():
 	get_tree().change_scene_to_file("res://scenes/ui/start_menu.tscn")

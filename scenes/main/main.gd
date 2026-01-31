@@ -128,6 +128,7 @@ func _place_tower(world_pos: Vector2):
 	tower.setup(selected_tower)
 	$TowersContainer.add_child(tower)
 	grid_manager.place_tower(world_pos)
+	GameParticles.spawn_build_poof(get_tree(), snap_pos)
 	
 	is_placing = false
 	selected_tower = ""

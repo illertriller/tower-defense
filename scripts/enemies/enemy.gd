@@ -236,5 +236,8 @@ func apply_burn(damage: float, duration: float):
 
 func die():
 	GameManager.enemy_killed(reward)
+	# Spawn death effect and gold text
+	GameParticles.spawn_death_poof(get_tree(), global_position)
+	GameParticles.spawn_gold_text(get_tree(), global_position, reward)
 	died.emit()
 	queue_free()

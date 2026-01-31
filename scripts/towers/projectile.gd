@@ -60,11 +60,18 @@ func _apply_hit(enemy: Area2D):
 	
 	# Splash damage
 	if splash_radius > 0:
+		GameParticles.spawn_explosion(get_tree(), global_position, splash_radius)
 		var splash_enemies = _get_enemies_in_radius(splash_radius)
 		for e in splash_enemies:
 			if e != enemy and is_instance_valid(e) and e.has_method("take_damage"):
-				e.take_damage(int(damage * 0.5))  # 50% splash damage
+				e.take_damage(int(damage * 0.5))
 				_apply_effects(e)
+	
+	# Visual effects for special projectiles
+	if apply_poison_on_hit:
+		GameParticles.spawn_poison_cloud(get_tree(), enemy.global_position)
+	if projectile_type == "holy":
+		GameParticles.spawn_holy_hit(get_tree(), enemy.global_position)
 
 func _apply_effects(enemy: Area2D):
 	if apply_slow_on_hit and enemy.has_method("apply_slow"):
