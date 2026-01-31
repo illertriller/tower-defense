@@ -5,9 +5,10 @@ extends Node2D
 var particles: Array = []
 
 func _ready():
+	var vp = get_viewport_rect().size
 	for i in range(30):
 		particles.append({
-			"pos": Vector2(randf() * 1280, randf() * 720),
+			"pos": Vector2(randf() * vp.x, randf() * vp.y),
 			"speed": randf_range(10, 40),
 			"size": randf_range(1.5, 4.0),
 			"alpha": randf_range(0.2, 0.7),
@@ -16,6 +17,7 @@ func _ready():
 		})
 
 func _process(delta: float):
+	var vp = get_viewport_rect().size
 	for p in particles:
 		p["pos"].y -= p["speed"] * delta
 		p["pos"].x += p["drift"] * delta
@@ -23,8 +25,8 @@ func _process(delta: float):
 		p["alpha"] = clampf(p["alpha"], 0.1, 0.8)
 		
 		if p["pos"].y < -10:
-			p["pos"].y = 730
-			p["pos"].x = randf() * 1280
+			p["pos"].y = vp.y + 10
+			p["pos"].x = randf() * vp.x
 	
 	queue_redraw()
 

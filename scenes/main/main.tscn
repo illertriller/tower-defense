@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://main001"]
+[gd_scene load_steps=8 format=3 uid="uid://main001"]
 
 [ext_resource type="Script" path="res://scenes/main/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/towers/tower.tscn" id="3"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/managers/grid_manager.gd" id="5"]
 [ext_resource type="Script" path="res://scenes/main/background.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_hud.tscn" id="7"]
+[ext_resource type="Script" path="res://scripts/managers/game_camera.gd" id="8"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -28,5 +29,8 @@ offset_right = 64.0
 offset_bottom = 64.0
 mouse_filter = 2
 color = Color(0, 1, 0, 0.3)
+
+[node name="GameCamera" type="Camera2D" parent="."]
+script = ExtResource("8")
 
 [node name="GameHUD" parent="." instance=ExtResource("7")]

@@ -42,6 +42,8 @@ var tower_types: Array = [
 ]
 
 var _selected_placed_tower: Node2D = null
+var _settings_scene: PackedScene = preload("res://scenes/ui/settings_menu.tscn")
+var _settings_instance: Control = null
 
 func _ready():
 	# ESC menu
@@ -49,6 +51,7 @@ func _ready():
 	resume_btn.pressed.connect(_on_resume)
 	restart_btn.pressed.connect(_on_restart)
 	settings_btn.pressed.connect(_on_settings)
+	settings_btn.disabled = false  # Settings now works!
 	main_menu_btn.pressed.connect(_on_main_menu)
 	start_wave_btn.pressed.connect(func(): wave_start_requested.emit())
 	
@@ -308,7 +311,16 @@ func _on_restart():
 	get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 
 func _on_settings():
-	pass
+	if _settings_instance:
+		return
+	_settings_instance = _settings_scene.instantiate()
+	_settings_instance.closed.connect(_on_settings_closed)
+	add_child(_settings_instance)
+
+func _on_settings_closed():
+	if _settings_instance:
+		_settings_instance.queue_free()
+		_settings_instance = null
 
 func _on_main_menu():
 	get_tree().paused = false

@@ -2,6 +2,7 @@ extends Node2D
 
 ## Main scene controller — data-driven level gameplay
 ## Uses GameHUD for all UI, handles tower placement and wave spawning
+## Now supports scrollable maps larger than the viewport
 
 @export var tower_scene: PackedScene
 
@@ -9,6 +10,9 @@ extends Node2D
 @onready var grid_manager: Node2D = $GridManager
 @onready var ghost_preview: ColorRect = $GhostPreview
 @onready var hud = $GameHUD
+@onready var camera: Camera2D = $GameCamera
+@onready var background: Node2D = $Background
+@onready var minimap = $GameHUD/MinimapMargin/Minimap
 
 var enemy_scene: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 var selected_tower: String = ""
@@ -17,6 +21,10 @@ var _spawning_complete: bool = false
 var _enemies_spawned: int = 0
 var _enemies_finished: int = 0
 var selected_placed_tower: Node2D = null
+
+# Map dimensions (from Settings)
+var map_width: int
+var map_height: int
 
 # Keyboard tower mapping
 var tower_types: Array = [
@@ -32,6 +40,19 @@ var tower_hotkeys: Dictionary = {
 }
 
 func _ready():
+	# Get map size from settings
+	map_width = Settings.map_width
+	map_height = Settings.map_height
+	
+	# Setup camera for map bounds
+	camera.setup(Vector2(map_width, map_height))
+	
+	# Setup grid for map size
+	grid_manager.setup_for_map(map_width, map_height)
+	
+	# Setup background for map size
+	background.setup(map_width, map_height)
+	
 	# Game signals
 	GameManager.money_changed.connect(func(_a): hud.update_hud())
 	GameManager.lives_changed.connect(func(_a): hud.update_hud())
@@ -53,6 +74,11 @@ func _ready():
 	ghost_preview.size = Vector2(64, 64)
 	ghost_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
+	# Setup minimap
+	var path_points = LevelData.get_path_points(GameManager.current_level)
+	minimap.setup(Vector2(map_width, map_height), path_points)
+	minimap.set_containers(enemy_path, $TowersContainer)
+	
 	hud.update_hud()
 
 func _setup_level():
@@ -65,12 +91,17 @@ func _setup_level():
 	grid_manager.mark_path_cells(enemy_path.curve)
 	enemy_path.queue_redraw()
 
+func _get_world_mouse_pos() -> Vector2:
+	## Convert screen mouse position to world coordinates accounting for camera
+	return get_global_mouse_position()
+
 func _process(_delta: float):
 	if is_placing:
-		var snap_pos = grid_manager.get_tower_snap_position(get_global_mouse_position())
+		var world_mouse = _get_world_mouse_pos()
+		var snap_pos = grid_manager.get_tower_snap_position(world_mouse)
 		ghost_preview.visible = true
 		ghost_preview.global_position = snap_pos - Vector2(32, 32)
-		ghost_preview.color = Color(0, 1, 0, 0.3) if grid_manager.can_place_tower(get_global_mouse_position()) else Color(1, 0, 0, 0.3)
+		ghost_preview.color = Color(0, 1, 0, 0.3) if grid_manager.can_place_tower(world_mouse) else Color(1, 0, 0, 0.3)
 	else:
 		ghost_preview.visible = false
 
@@ -106,9 +137,9 @@ func _deselect_all():
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT and is_placing:
-			_place_tower(get_global_mouse_position())
+			_place_tower(_get_world_mouse_pos())
 		elif event.button_index == MOUSE_BUTTON_LEFT and not is_placing:
-			_try_select_placed_tower(get_global_mouse_position())
+			_try_select_placed_tower(_get_world_mouse_pos())
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_deselect_all()
 	

@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://game_hud_001"]
+[gd_scene load_steps=6 format=3 uid="uid://game_hud_001"]
 
 [ext_resource type="Script" path="res://scenes/ui/game_hud.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="2"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_topbar"]
 font_size = 18
@@ -50,6 +51,21 @@ text = "♥ 20"
 layout_mode = 2
 label_settings = SubResource("LabelSettings_topbar")
 text = "Wave 0/10"
+
+[node name="MinimapMargin" type="MarginContainer" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 140.0
+grow_horizontal = 0
+
+[node name="Minimap" type="Control" parent="MinimapMargin"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 120)
+script = ExtResource("2")
 
 [node name="BottomPanel" type="PanelContainer" parent="."]
 anchors_preset = 12
@@ -169,7 +185,6 @@ text = "Restart Level"
 layout_mode = 2
 custom_minimum_size = Vector2(200, 40)
 text = "Settings"
-disabled = true
 
 [node name="MainMenuBtn" type="Button" parent="EscMenu/VBox"]
 layout_mode = 2

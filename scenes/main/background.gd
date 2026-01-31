@@ -3,19 +3,29 @@ extends Node2D
 ## Draws continuous terrain background with themed environmental details
 ## PRD: "Grass field as continuous background layer (NOT grid-tied squares/circles)"
 ## Each level has unique terrain + scattered decorative details
+## Now supports dynamic map sizes
 
 var terrain_texture: Texture2D
 var decorations: Array = []  # [{pos, type, size, color, ...}]
+var _map_width: int = 2560
+var _map_height: int = 1440
 
 func _ready():
+	pass  # setup() called by main scene
+
+func setup(map_w: int, map_h: int):
+	_map_width = map_w
+	_map_height = map_h
 	var theme = LevelData.get_terrain_theme(GameManager.current_level)
 	_generate_terrain(theme)
 	_generate_decorations(GameManager.current_level, theme)
 	queue_redraw()
 
 func _generate_terrain(theme: Dictionary):
-	var w = 320
-	var h = 180
+	# Generate at 1/4 resolution then upscale (saves memory on large maps)
+	var scale_div = 4
+	var w = _map_width / scale_div
+	var h = _map_height / scale_div
 	var img = Image.create(w, h, false, Image.FORMAT_RGB8)
 	
 	var noise = FastNoiseLite.new()
@@ -39,7 +49,7 @@ func _generate_terrain(theme: Dictionary):
 			var color = base_color.lerp(var_color, blend)
 			img.set_pixel(x, y, color)
 	
-	img.resize(1280, 720, Image.INTERPOLATE_BILINEAR)
+	img.resize(_map_width, _map_height, Image.INTERPOLATE_BILINEAR)
 	terrain_texture = ImageTexture.create_from_image(img)
 
 func _generate_decorations(level: int, theme: Dictionary):
@@ -50,17 +60,19 @@ func _generate_decorations(level: int, theme: Dictionary):
 	# Get path segments to avoid placing decorations on the road
 	var path_points = LevelData.get_path_points(level)
 	
-	var count = 80  # Number of decoration attempts
+	# Scale decoration count with map size
+	var area_ratio = float(_map_width * _map_height) / (1280.0 * 720.0)
+	var count = int(80 * area_ratio)
 	
+	var margin = 30
 	for i in range(count):
-		var pos = Vector2(rng.randf_range(30, 1250), rng.randf_range(30, 690))
+		var pos = Vector2(
+			rng.randf_range(margin, _map_width - margin),
+			rng.randf_range(margin, _map_height - margin)
+		)
 		
 		# Skip if too close to any path segment
 		if _near_path(pos, path_points, 55.0):
-			continue
-		
-		# Skip if too close to edges (HUD areas)
-		if pos.y < 45 or pos.y > 680:
 			continue
 		
 		var deco = _make_decoration(level, rng, pos, theme)
@@ -169,7 +181,7 @@ func _draw():
 	if terrain_texture:
 		draw_texture(terrain_texture, Vector2.ZERO)
 	else:
-		draw_rect(Rect2(0, 0, 1280, 720), Color(0.28, 0.55, 0.22))
+		draw_rect(Rect2(0, 0, _map_width, _map_height), Color(0.28, 0.55, 0.22))
 	
 	# Layer 2: Decorations
 	for d in decorations:
@@ -181,7 +193,6 @@ func _draw_decoration(d: Dictionary):
 		"grass_tuft":
 			var h = d.height
 			var c: Color = d.color
-			# 3-5 blades of grass
 			for blade in range(4):
 				var offset_x = (blade - 1.5) * 3.0
 				var sway = (blade % 2) * 2.0 - 1.0
@@ -189,21 +200,16 @@ func _draw_decoration(d: Dictionary):
 		
 		"flower":
 			var stem_h = d.stem_h
-			# Stem
 			draw_line(pos, pos + Vector2(0, -stem_h), Color(0.2, 0.4, 0.15), 1.0)
-			# Petals (small circle)
 			draw_circle(pos + Vector2(0, -stem_h), 2.5, d.color)
-			# Center dot
 			draw_circle(pos + Vector2(0, -stem_h), 1.0, Color(0.9, 0.8, 0.2))
 		
 		"rock":
 			var s = d.size
-			# Simple rock: dark ellipse with highlight
 			draw_circle(pos, s, d.color)
 			draw_circle(pos + Vector2(-s * 0.25, -s * 0.25), s * 0.5, d.color.lightened(0.15))
 		
 		"leaf":
-			# Fallen leaf: small rotated diamond
 			var s = 3.5
 			var rot = d.rot
 			var c: Color = d.color
@@ -215,10 +221,8 @@ func _draw_decoration(d: Dictionary):
 		
 		"hay_bale":
 			var s = d.size
-			# Rounded rectangle shape
 			draw_circle(pos, s * 0.6, d.color)
 			draw_circle(pos, s * 0.4, d.color.lightened(0.1))
-			# Straw lines
 			for i in range(3):
 				var angle = i * TAU / 3.0
 				draw_line(pos, pos + Vector2(cos(angle), sin(angle)) * s * 0.5,
@@ -226,15 +230,11 @@ func _draw_decoration(d: Dictionary):
 		
 		"mushroom":
 			var s = d.size
-			# Stem
 			draw_line(pos, pos + Vector2(0, -s * 1.2), Color(0.85, 0.8, 0.7), 2.0)
-			# Cap
 			draw_circle(pos + Vector2(0, -s * 1.2), s * 0.8, d.cap_color)
-			# Cap highlight
 			draw_circle(pos + Vector2(-1, -s * 1.2 - 1), s * 0.35, d.cap_color.lightened(0.25))
 		
 		"moss":
-			# Soft blob
 			draw_circle(pos, d.size * 0.5, d.color)
 			draw_circle(pos + Vector2(d.size * 0.3, -d.size * 0.1), d.size * 0.35, d.color)
 			draw_circle(pos + Vector2(-d.size * 0.2, d.size * 0.2), d.size * 0.3, d.color)
@@ -242,9 +242,7 @@ func _draw_decoration(d: Dictionary):
 		"fern":
 			var s = d.size
 			var c: Color = d.color
-			# Central stem
 			draw_line(pos, pos + Vector2(0, -s), c, 1.0)
-			# Fronds (alternating)
 			for i in range(3):
 				var y_off = -s * (0.3 + i * 0.25)
 				draw_line(pos + Vector2(0, y_off), pos + Vector2(-s * 0.4, y_off - 2), c, 1.0)
@@ -253,9 +251,7 @@ func _draw_decoration(d: Dictionary):
 		"cactus":
 			var h = d.height
 			var c: Color = d.color
-			# Main trunk
 			draw_line(pos, pos + Vector2(0, -h), c, 4.0, true)
-			# Arms
 			var arm_y = h * 0.5
 			draw_line(pos + Vector2(0, -arm_y), pos + Vector2(-7, -arm_y), c, 3.0, true)
 			draw_line(pos + Vector2(-7, -arm_y), pos + Vector2(-7, -arm_y - 6), c, 3.0, true)
@@ -267,30 +263,23 @@ func _draw_decoration(d: Dictionary):
 		"bones":
 			var s = d.size
 			var c: Color = d.color
-			# Crossed bones
 			draw_line(pos + Vector2(-s, -s*0.3), pos + Vector2(s, s*0.3), c, 1.5, true)
 			draw_line(pos + Vector2(-s*0.3, s*0.5), pos + Vector2(s*0.3, -s*0.5), c, 1.5, true)
-			# Bone knobs
 			draw_circle(pos + Vector2(-s, -s*0.3), 2.0, c)
 			draw_circle(pos + Vector2(s, s*0.3), 2.0, c)
 		
 		"sand_ripple":
 			var w = d.width
 			var c: Color = d.color
-			# Subtle curved lines
 			for i in range(3):
 				var y_off = i * 4.0
 				draw_line(pos + Vector2(-w*0.5, y_off), pos + Vector2(w*0.5, y_off), c, 1.0, true)
 		
 		"lava_pool":
 			var s = d.size
-			# Outer glow
 			draw_circle(pos, s * 1.3, Color(0.9, 0.2, 0.0, 0.2))
-			# Dark crust edge
 			draw_circle(pos, s, Color(0.15, 0.08, 0.05))
-			# Inner lava
 			draw_circle(pos, s * 0.7, d.color)
-			# Bright hotspot
 			draw_circle(pos + Vector2(-s*0.15, -s*0.15), s * 0.3, Color(1.0, 0.7, 0.1))
 		
 		"crack":
@@ -298,15 +287,12 @@ func _draw_decoration(d: Dictionary):
 			var rot = d.rot
 			var c: Color = d.color
 			var dir = Vector2(cos(rot), sin(rot))
-			# Main crack
 			draw_line(pos - dir * l * 0.5, pos + dir * l * 0.5, c, 1.5)
-			# Branch cracks
 			var mid = pos + dir * l * 0.15
 			var perp = Vector2(-dir.y, dir.x)
 			draw_line(mid, mid + perp * l * 0.3, c * Color(1,1,1,0.5), 1.0)
 		
 		"ember":
-			# Glowing ember dot
 			draw_circle(pos, d.size * 2.0, Color(1.0, 0.4, 0.0, 0.15))
 			draw_circle(pos, d.size, d.color)
 			draw_circle(pos, d.size * 0.4, Color(1.0, 0.9, 0.4))
@@ -314,10 +300,7 @@ func _draw_decoration(d: Dictionary):
 		"skull_rock":
 			var s = d.size
 			var c: Color = d.color
-			# Rock body
 			draw_circle(pos, s, c)
-			# Skull-like features: two dark "eye" hollows
 			draw_circle(pos + Vector2(-s*0.3, -s*0.2), s * 0.2, c.darkened(0.4))
 			draw_circle(pos + Vector2(s*0.3, -s*0.2), s * 0.2, c.darkened(0.4))
-			# Highlight
 			draw_circle(pos + Vector2(-s*0.2, -s*0.4), s * 0.25, c.lightened(0.12))

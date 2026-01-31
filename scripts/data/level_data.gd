@@ -3,10 +3,8 @@ class_name LevelData
 
 ## Static level definitions for all 5 levels
 ## Each level has: name, path points, and wave definitions
-
-# Level path points (packed as Vector2 arrays for Curve2D)
-# Viewport: 1280x720, grid: 32px cells
-# All coordinates snapped to 32px grid cell centers (x*32+16, y*32+16)
+## Map size: 2560x1440 (80x45 grid cells at 32px each)
+## All coordinates snapped to 32px grid cell centers (x*32+16, y*32+16)
 
 static func get_level_count() -> int:
 	return 5
@@ -67,75 +65,94 @@ static func get_level_name(level: int) -> String:
 	return names.get(level, "Unknown")
 
 static func get_path_points(level: int) -> PackedVector2Array:
+	# Map size: 2560x1440
+	# Grid: 80 x 45 cells (32px each)
+	# Paths use the full map — much longer routes for bigger strategy
 	match level:
 		1:
-			# Simple S-curve — easy intro, lots of tower space
+			# The Valley — gentle S-curve across the map, good intro
+			# Enters left, sweeps through wide open spaces
 			return PackedVector2Array([
-				Vector2(-48, 208),
-				Vector2(208, 208),
-				Vector2(208, 400),
-				Vector2(496, 400),
-				Vector2(496, 144),
-				Vector2(784, 144),
-				Vector2(784, 496),
-				Vector2(1104, 496),
-				Vector2(1328, 304)
+				Vector2(-48, 400),
+				Vector2(336, 400),
+				Vector2(336, 800),
+				Vector2(816, 800),
+				Vector2(816, 240),
+				Vector2(1360, 240),
+				Vector2(1360, 960),
+				Vector2(1904, 960),
+				Vector2(1904, 400),
+				Vector2(2608, 400)
 			])
 		2:
-			# The Crossing — enters from top, crosses the map
+			# The Crossing — enters top-left, zigzags down then across
+			# Longer path with more bends
 			return PackedVector2Array([
-				Vector2(-48, 112),
-				Vector2(176, 112),
-				Vector2(176, 368),
-				Vector2(560, 368),
-				Vector2(560, 112),
-				Vector2(880, 112),
-				Vector2(880, 528),
-				Vector2(1328, 528)
+				Vector2(-48, 208),
+				Vector2(400, 208),
+				Vector2(400, 720),
+				Vector2(880, 720),
+				Vector2(880, 208),
+				Vector2(1360, 208),
+				Vector2(1360, 1040),
+				Vector2(1840, 1040),
+				Vector2(1840, 480),
+				Vector2(2608, 480)
 			])
 		3:
-			# The Spiral — clockwise spiral inward, exits right
+			# The Spiral — massive clockwise spiral, enters left exits right
+			# Uses the full map space for a grand sweeping spiral
 			return PackedVector2Array([
-				Vector2(-48, 336),
-				Vector2(144, 336),
-				Vector2(144, 80),
-				Vector2(1104, 80),
-				Vector2(1104, 592),
-				Vector2(336, 592),
-				Vector2(336, 272),
-				Vector2(848, 272),
-				Vector2(848, 432),
-				Vector2(1328, 432)
+				Vector2(-48, 720),
+				Vector2(240, 720),
+				Vector2(240, 160),
+				Vector2(2320, 160),
+				Vector2(2320, 1280),
+				Vector2(560, 1280),
+				Vector2(560, 480),
+				Vector2(1840, 480),
+				Vector2(1840, 960),
+				Vector2(880, 960),
+				Vector2(880, 640),
+				Vector2(1520, 640),
+				Vector2(1520, 800),
+				Vector2(2608, 800)
 			])
 		4:
-			# The Serpent — tight zigzag, narrow corridors
+			# The Serpent — tight zigzag across the whole map
+			# Maximum path length through narrow corridors
 			return PackedVector2Array([
-				Vector2(-48, 80),
-				Vector2(304, 80),
-				Vector2(304, 592),
-				Vector2(624, 592),
-				Vector2(624, 80),
-				Vector2(944, 80),
-				Vector2(944, 592),
-				Vector2(1328, 592)
+				Vector2(-48, 160),
+				Vector2(480, 160),
+				Vector2(480, 1280),
+				Vector2(960, 1280),
+				Vector2(960, 160),
+				Vector2(1440, 160),
+				Vector2(1440, 1280),
+				Vector2(1920, 1280),
+				Vector2(1920, 160),
+				Vector2(2608, 160)
 			])
 		5:
-			# The Gauntlet — maximum length, complex routing
+			# The Gauntlet — maximum complexity, uses every corner
+			# The ultimate maze with switchbacks and loops
 			return PackedVector2Array([
-				Vector2(-48, 176),
-				Vector2(208, 176),
-				Vector2(208, 560),
-				Vector2(464, 560),
-				Vector2(464, 112),
-				Vector2(720, 112),
-				Vector2(720, 432),
-				Vector2(560, 432),
-				Vector2(560, 304),
-				Vector2(880, 304),
-				Vector2(880, 560),
-				Vector2(1104, 560),
-				Vector2(1104, 176),
-				Vector2(1328, 176)
+				Vector2(-48, 336),
+				Vector2(368, 336),
+				Vector2(368, 1200),
+				Vector2(720, 1200),
+				Vector2(720, 240),
+				Vector2(1120, 240),
+				Vector2(1120, 880),
+				Vector2(800, 880),
+				Vector2(800, 560),
+				Vector2(1440, 560),
+				Vector2(1440, 1200),
+				Vector2(1840, 1200),
+				Vector2(1840, 336),
+				Vector2(2160, 336),
+				Vector2(2160, 1040),
+				Vector2(2608, 1040)
 			])
 		_:
 			return get_path_points(1)  # fallback
@@ -161,33 +178,23 @@ static func get_total_waves(_level: int) -> int:
 # === LEVEL 1 — The Valley (Easy Intro) ===
 static func _level_1_waves() -> Array:
 	return [
-		# Wave 1: Just imps
 		[{"type": "imp", "count": 5, "delay": 1.2}],
-		# Wave 2: More imps
 		[{"type": "imp", "count": 8, "delay": 1.0}],
-		# Wave 3: Introduce hell hounds
 		[{"type": "imp", "count": 5, "delay": 1.0},
 		 {"type": "hell_hound", "count": 3, "delay": 0.7}],
-		# Wave 4: Mixed
 		[{"type": "imp", "count": 6, "delay": 0.9},
 		 {"type": "hell_hound", "count": 5, "delay": 0.6}],
-		# Wave 5: Introduce brute
 		[{"type": "imp", "count": 8, "delay": 0.8},
 		 {"type": "brute_demon", "count": 2, "delay": 2.0}],
-		# Wave 6: Fast rush
 		[{"type": "hell_hound", "count": 10, "delay": 0.4}],
-		# Wave 7: Heavy mixed
 		[{"type": "imp", "count": 10, "delay": 0.7},
 		 {"type": "hell_hound", "count": 5, "delay": 0.5},
 		 {"type": "brute_demon", "count": 3, "delay": 1.5}],
-		# Wave 8: Introduce shadow stalker
 		[{"type": "shadow_stalker", "count": 4, "delay": 1.0},
 		 {"type": "imp", "count": 8, "delay": 0.6}],
-		# Wave 9: Big push
 		[{"type": "imp", "count": 12, "delay": 0.5},
 		 {"type": "hell_hound", "count": 8, "delay": 0.4},
 		 {"type": "brute_demon", "count": 4, "delay": 1.2}],
-		# Wave 10: Mini boss
 		[{"type": "imp", "count": 10, "delay": 0.6},
 		 {"type": "brute_demon", "count": 5, "delay": 1.0},
 		 {"type": "hell_knight", "count": 1, "delay": 3.0}],
