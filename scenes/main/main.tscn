@@ -33,7 +33,7 @@ color = Color(0, 1, 0, 0.3)
 [node name="TopBar" type="HBoxContainer" parent="UI"]
 offset_left = 10.0
 offset_top = 10.0
-offset_right = 800.0
+offset_right = 900.0
 offset_bottom = 50.0
 
 [node name="LevelLabel" type="Label" parent="UI/TopBar"]
@@ -57,33 +57,27 @@ custom_minimum_size = Vector2(30, 0)
 [node name="WaveLabel" type="Label" parent="UI/TopBar"]
 text = "Wave: 0 / 10"
 
-[node name="TowerPanel" type="HBoxContainer" parent="UI"]
+[node name="TowerPanel" type="PanelContainer" parent="UI"]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -260.0
-offset_top = -80.0
-offset_right = 260.0
-offset_bottom = -10.0
-alignment = 1
+offset_left = -560.0
+offset_top = -85.0
+offset_right = 560.0
+offset_bottom = -5.0
 
-[node name="ArrowBtn" type="Button" parent="UI/TowerPanel"]
-custom_minimum_size = Vector2(120, 60)
-text = "Arrow (50g)"
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/TowerPanel"]
+layout_mode = 2
+horizontal_scroll_mode = 2
+vertical_scroll_mode = 0
 
-[node name="CannonBtn" type="Button" parent="UI/TowerPanel"]
-custom_minimum_size = Vector2(120, 60)
-text = "Cannon (100g)"
-
-[node name="MagicBtn" type="Button" parent="UI/TowerPanel"]
-custom_minimum_size = Vector2(120, 60)
-text = "Magic (75g)"
-
-[node name="TeslaBtn" type="Button" parent="UI/TowerPanel"]
-custom_minimum_size = Vector2(120, 60)
-text = "Tesla (125g)"
+[node name="TowerGrid" type="GridContainer" parent="UI/TowerPanel/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 14
 
 [node name="StartWaveBtn" type="Button" parent="UI"]
 anchors_preset = 1
@@ -94,3 +88,17 @@ offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 50.0
 text = "Start Wave!"
+
+[node name="UpgradePanel" type="PanelContainer" parent="UI"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -210.0
+offset_top = 60.0
+offset_right = -10.0
+offset_bottom = 300.0
+
+[node name="VBox" type="VBoxContainer" parent="UI/UpgradePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8

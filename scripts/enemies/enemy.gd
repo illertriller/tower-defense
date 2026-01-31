@@ -16,13 +16,21 @@ var reward: int = 10
 var slow_multiplier: float = 1.0
 var slow_timer: float = 0.0
 var enemy_type: String = "imp"
+var is_flying: bool = false
+
+# DoT effects
+var poison_damage: float = 0.0
+var poison_timer: float = 0.0
+var burn_damage: float = 0.0
+var burn_timer: float = 0.0
+var dot_tick_timer: float = 0.0
 
 # All 10 demon enemy types with stats
 var enemy_types: Dictionary = {
 	"imp": {"health": 40, "speed": 80, "reward": 5},
 	"hell_hound": {"health": 25, "speed": 160, "reward": 8},
 	"brute_demon": {"health": 200, "speed": 40, "reward": 20},
-	"wraith": {"health": 60, "speed": 90, "reward": 12},
+	"wraith": {"health": 60, "speed": 90, "reward": 12, "flying": true},
 	"fire_elemental": {"health": 80, "speed": 70, "reward": 15},
 	"shadow_stalker": {"health": 50, "speed": 100, "reward": 12},
 	"bone_golem": {"health": 400, "speed": 25, "reward": 35},
@@ -81,6 +89,7 @@ func setup(type: String):
 		health = max_health
 		speed = data["speed"]
 		reward = data["reward"]
+		is_flying = data.get("flying", false)
 
 func _ready():
 	health_bar.max_value = max_health
@@ -156,6 +165,28 @@ func _process(delta: float):
 		if slow_timer <= 0:
 			slow_multiplier = 1.0
 	
+	# Handle DoT effects (poison + burn)
+	dot_tick_timer += delta
+	if dot_tick_timer >= 0.5:  # Tick every 0.5 seconds
+		dot_tick_timer -= 0.5
+		var dot_total: float = 0.0
+		if poison_timer > 0:
+			poison_timer -= 0.5
+			dot_total += poison_damage * 0.5
+			animated_sprite.modulate = Color(0.6, 1.0, 0.6, 1)  # Green tint
+		if burn_timer > 0:
+			burn_timer -= 0.5
+			dot_total += burn_damage * 0.5
+			animated_sprite.modulate = Color(1.0, 0.7, 0.5, 1)  # Orange tint
+		if dot_total > 0:
+			health -= int(dot_total)
+			health_bar.value = health
+			if health <= 0:
+				die()
+				return
+		elif poison_timer <= 0 and burn_timer <= 0:
+			animated_sprite.modulate = Color(1, 1, 1, 1)  # Reset tint
+	
 	# Move along path
 	var path_follow = get_parent() as PathFollow2D
 	if path_follow:
@@ -194,6 +225,14 @@ func take_damage(amount: int):
 func apply_slow(amount: float, duration: float):
 	slow_multiplier = amount
 	slow_timer = duration
+
+func apply_poison(damage: float, duration: float):
+	poison_damage = damage
+	poison_timer = duration
+
+func apply_burn(damage: float, duration: float):
+	burn_damage = damage
+	burn_timer = duration
 
 func die():
 	GameManager.enemy_killed(reward)
