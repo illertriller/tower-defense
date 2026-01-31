@@ -21,7 +21,7 @@ signal wave_start_requested()
 @onready var info_title: Label = $BottomPanel/HBox/InfoPanel/Title
 @onready var info_stats: Label = $BottomPanel/HBox/InfoPanel/Stats
 @onready var info_desc: Label = $BottomPanel/HBox/InfoPanel/Desc
-@onready var upgrade_container: VBoxContainer = $BottomPanel/HBox/InfoPanel/Upgrades
+@onready var upgrade_container: VBoxContainer = $BottomPanel/HBox/InfoPanel/UpgradeScroll/Upgrades
 @onready var controls_container: VBoxContainer = $BottomPanel/HBox/Controls
 
 # ESC menu

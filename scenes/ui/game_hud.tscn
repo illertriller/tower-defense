@@ -103,8 +103,14 @@ text = "or click a placed tower to upgrade"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Upgrades" type="VBoxContainer" parent="BottomPanel/HBox/InfoPanel"]
+[node name="UpgradeScroll" type="ScrollContainer" parent="BottomPanel/HBox/InfoPanel"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Upgrades" type="VBoxContainer" parent="BottomPanel/HBox/InfoPanel/UpgradeScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 3
 
 [node name="Controls" type="VBoxContainer" parent="BottomPanel/HBox"]
