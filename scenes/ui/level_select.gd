@@ -7,8 +7,9 @@ extends Control
 
 func _ready():
 	back_btn.pressed.connect(_on_back_pressed)
-	# Load saved progress
-	GameManager.max_level_unlocked = max(GameManager.max_level_unlocked, SaveManager.load_progress())
+	# DEV: All levels unlocked for testing (restore lock logic later)
+	GameManager.max_level_unlocked = 5
+	#GameManager.max_level_unlocked = max(GameManager.max_level_unlocked, SaveManager.load_progress())
 	_create_level_buttons()
 
 func _create_level_buttons():
