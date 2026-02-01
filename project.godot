@@ -1,6 +1,12 @@
 ; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
-; but EDI doesn't have that luxury 🤖
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
 
 [application]
 
@@ -10,6 +16,11 @@ run/main_scene="res://scenes/ui/start_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.png"
 
+[autoload]
+
+Settings="*res://scripts/managers/settings_manager.gd"
+GameManager="*res://scripts/managers/game_manager.gd"
+
 [display]
 
 window/size/viewport_width=1920
@@ -17,10 +28,9 @@ window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
-[autoload]
+[editor_plugins]
 
-Settings="*res://scripts/managers/settings_manager.gd"
-GameManager="*res://scripts/managers/game_manager.gd"
+enabled=PackedStringArray("res://addons/GDScript.h8.Palette/plugin.cfg")
 
 [rendering]
 
