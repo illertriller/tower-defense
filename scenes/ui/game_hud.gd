@@ -73,36 +73,46 @@ const UI_GOLD_DIM = Color(0.50, 0.40, 0.15)
 const UI_SHADOW = Color(0.0, 0.0, 0.0, 0.5)
 
 const DECO_PATH = "res://assets/sprites/ui/decorations/"
+const UI_TEX = "res://assets/sprites/ui/"
 
-# === UI STYLING — Flat panels + ornate decorations at native size ===
+# === UI STYLING — Texture-based panels + ornate decorations ===
 func _apply_ui_style():
 	_style_bottom_panel()
+	_style_info_panel()
 	_style_top_bar()
 	_style_esc_menu()
 	_style_all_buttons()
+	_add_minimap_frame()
 
 func _style_bottom_panel():
-	# Clean flat base
-	var style = StyleBoxFlat.new()
-	style.bg_color = UI_BG
-	style.border_color = UI_GOLD
-	style.border_width_top = 3
-	style.border_width_bottom = 2
-	style.border_width_left = 2
-	style.border_width_right = 2
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.content_margin_left = 10
-	style.content_margin_right = 10
-	style.content_margin_top = 10
-	style.content_margin_bottom = 6
-	style.shadow_color = UI_SHADOW
-	style.shadow_size = 6
-	style.shadow_offset = Vector2(0, -2)
-	bottom_panel.add_theme_stylebox_override("panel", style)
+	# Texture-based panel background (dark brick pattern)
+	var tex = _load_tex(UI_TEX + "ui_panel_bg.png")
+	if tex:
+		var style = _make_tex_style(tex, 20, 12, 20, 12, 10, 10, 10, 6)
+		style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+		style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+		bottom_panel.add_theme_stylebox_override("panel", style)
+	else:
+		# Fallback flat style
+		var style = StyleBoxFlat.new()
+		style.bg_color = UI_BG
+		style.border_color = UI_GOLD
+		style.border_width_top = 3
+		style.border_width_bottom = 2
+		style.border_width_left = 2
+		style.border_width_right = 2
+		style.corner_radius_top_left = 4
+		style.corner_radius_top_right = 4
+		style.content_margin_left = 10
+		style.content_margin_right = 10
+		style.content_margin_top = 10
+		style.content_margin_bottom = 6
+		style.shadow_color = UI_SHADOW
+		style.shadow_size = 6
+		style.shadow_offset = Vector2(0, -2)
+		bottom_panel.add_theme_stylebox_override("panel", style)
 	
 	# Decorative overlays at native size (no stretching!)
-	# These are added to the HUD layer directly and positioned over the panel
 	_add_panel_decorations()
 
 func _style_top_bar():
@@ -122,18 +132,25 @@ func _style_top_bar():
 	top_panel.offset_right = 0
 	top_panel.offset_bottom = 40
 	
-	var style = StyleBoxFlat.new()
-	style.bg_color = UI_BG
-	style.border_color = UI_GOLD
-	style.border_width_bottom = 2
-	style.content_margin_left = 16
-	style.content_margin_right = 16
-	style.content_margin_top = 6
-	style.content_margin_bottom = 6
-	style.shadow_color = UI_SHADOW
-	style.shadow_size = 4
-	style.shadow_offset = Vector2(0, 2)
-	top_panel.add_theme_stylebox_override("panel", style)
+	# Texture-based top bar frame (gold border with gem studs)
+	var tex = _load_tex(UI_TEX + "topbar_frame.png")
+	if tex:
+		var style = _make_tex_style(tex, 48, 8, 48, 8, 16, 6, 16, 6)
+		style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
+		top_panel.add_theme_stylebox_override("panel", style)
+	else:
+		var style = StyleBoxFlat.new()
+		style.bg_color = UI_BG
+		style.border_color = UI_GOLD
+		style.border_width_bottom = 2
+		style.content_margin_left = 16
+		style.content_margin_right = 16
+		style.content_margin_top = 6
+		style.content_margin_bottom = 6
+		style.shadow_color = UI_SHADOW
+		style.shadow_size = 4
+		style.shadow_offset = Vector2(0, 2)
+		top_panel.add_theme_stylebox_override("panel", style)
 	
 	# Emblem decoration on top bar
 	var emblem_tex = _load_tex(DECO_PATH + "topbar_emblem.png")
@@ -166,6 +183,15 @@ func _add_panel_decorations():
 		right.flip_h = true
 		add_child(right)
 		right.position = Vector2(vp_size.x - corner_tex.get_width() - 4, panel_top_y - 4)
+	
+	# Decorative frame border strip at top of bottom panel
+	var border_tex = _load_tex(UI_TEX + "ui_frame_border.png")
+	if border_tex:
+		var border = _make_deco_rect(border_tex)
+		border.stretch_mode = TextureRect.STRETCH_SCALE
+		border.size = Vector2(vp_size.x, border_tex.get_height())
+		add_child(border)
+		border.position = Vector2(0, panel_top_y - border_tex.get_height() + 1)
 
 func _make_deco_rect(tex: Texture2D) -> TextureRect:
 	var rect = TextureRect.new()
@@ -177,22 +203,45 @@ func _make_deco_rect(tex: Texture2D) -> TextureRect:
 	return rect
 
 func _style_esc_menu():
-	var style = StyleBoxFlat.new()
-	style.bg_color = UI_BG_LIGHT
-	style.border_color = UI_GOLD
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(6)
-	style.set_content_margin_all(24)
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
-	style.shadow_size = 12
-	style.shadow_offset = Vector2(0, 4)
-	esc_menu.add_theme_stylebox_override("panel", style)
+	# Texture-based ESC menu panel (ornate frame)
+	var tex = _load_tex(UI_TEX + "panel_frame.png")
+	if tex:
+		var style = _make_tex_style(tex, 40, 20, 40, 20, 24, 24, 24, 24)
+		esc_menu.add_theme_stylebox_override("panel", style)
+	else:
+		var style = StyleBoxFlat.new()
+		style.bg_color = UI_BG_LIGHT
+		style.border_color = UI_GOLD
+		style.set_border_width_all(3)
+		style.set_corner_radius_all(6)
+		style.set_content_margin_all(24)
+		style.shadow_color = Color(0.0, 0.0, 0.0, 0.65)
+		style.shadow_size = 12
+		style.shadow_offset = Vector2(0, 4)
+		esc_menu.add_theme_stylebox_override("panel", style)
 
 func _style_all_buttons():
-	var normal = _make_flat_btn(UI_BG_LIGHT, UI_GOLD)
-	var hover = _make_flat_btn(Color(0.16, 0.12, 0.08, 0.95), UI_GOLD_BRIGHT)
-	var pressed = _make_flat_btn(Color(0.06, 0.04, 0.02, 0.95), UI_GOLD)
-	var disabled = _make_flat_btn(Color(0.08, 0.07, 0.06, 0.7), UI_GOLD_DIM)
+	# Texture-based buttons (stone tablet with gold corners)
+	var tex_n = _load_tex(UI_TEX + "button_normal.png")
+	var tex_h = _load_tex(UI_TEX + "button_hover.png")
+	var tex_p = _load_tex(UI_TEX + "button_pressed.png")
+	
+	var normal: StyleBox
+	var hover: StyleBox
+	var pressed: StyleBox
+	var disabled: StyleBox
+	
+	if tex_n and tex_h and tex_p:
+		normal = _make_tex_style(tex_n, 20, 16, 20, 16, 8, 6, 8, 6)
+		hover = _make_tex_style(tex_h, 20, 16, 20, 16, 8, 6, 8, 6)
+		pressed = _make_tex_style(tex_p, 20, 16, 20, 16, 8, 6, 8, 6)
+		disabled = _make_tex_style(tex_n, 20, 16, 20, 16, 8, 6, 8, 6)
+		disabled.modulate_color = Color(0.5, 0.5, 0.5, 0.7)
+	else:
+		normal = _make_flat_btn(UI_BG_LIGHT, UI_GOLD)
+		hover = _make_flat_btn(Color(0.16, 0.12, 0.08, 0.95), UI_GOLD_BRIGHT)
+		pressed = _make_flat_btn(Color(0.06, 0.04, 0.02, 0.95), UI_GOLD)
+		disabled = _make_flat_btn(Color(0.08, 0.07, 0.06, 0.7), UI_GOLD_DIM)
 	
 	for btn in [resume_btn, restart_btn, settings_btn, main_menu_btn, start_wave_btn]:
 		btn.add_theme_stylebox_override("normal", normal)
@@ -217,6 +266,60 @@ func _load_tex(path: String) -> Texture2D:
 		return load(path)
 	return null
 
+func _make_tex_style(tex: Texture2D, tl: float, tt: float, tr: float, tb: float,
+		cl: float = 8, ct: float = 8, cr: float = 8, cb: float = 8) -> StyleBoxTexture:
+	var s = StyleBoxTexture.new()
+	s.texture = tex
+	s.texture_margin_left = tl
+	s.texture_margin_top = tt
+	s.texture_margin_right = tr
+	s.texture_margin_bottom = tb
+	s.content_margin_left = cl
+	s.content_margin_top = ct
+	s.content_margin_right = cr
+	s.content_margin_bottom = cb
+	return s
+
+# === INFO PANEL TEXTURE WRAP ===
+func _style_info_panel():
+	var tex = _load_tex(UI_TEX + "ui_info_panel_bg.png")
+	if not tex:
+		return
+	var wrapper = PanelContainer.new()
+	wrapper.name = "InfoPanelBg"
+	var parent = info_panel.get_parent()
+	var idx = info_panel.get_index()
+	# Transfer layout properties to wrapper
+	wrapper.size_flags_horizontal = info_panel.size_flags_horizontal
+	wrapper.size_flags_stretch_ratio = info_panel.size_flags_stretch_ratio
+	info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info_panel.size_flags_stretch_ratio = 1.0
+	parent.remove_child(info_panel)
+	wrapper.add_child(info_panel)
+	parent.add_child(wrapper)
+	parent.move_child(wrapper, idx)
+	var style = _make_tex_style(tex, 20, 14, 20, 14, 6, 4, 6, 4)
+	wrapper.add_theme_stylebox_override("panel", style)
+
+# === MINIMAP FRAME ===
+func _add_minimap_frame():
+	var tex = _load_tex(UI_TEX + "ui_minimap_frame.png")
+	if not tex:
+		return
+	var minimap_margin = get_node_or_null("MinimapMargin")
+	if not minimap_margin:
+		return
+	var frame = NinePatchRect.new()
+	frame.name = "MinimapFrame"
+	frame.texture = tex
+	frame.patch_margin_left = 16
+	frame.patch_margin_right = 16
+	frame.patch_margin_top = 16
+	frame.patch_margin_bottom = 16
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	minimap_margin.add_child(frame)
+	minimap_margin.move_child(frame, 0)
+
 # === TOWER SLOT STYLES ===
 func _make_tower_slot_style(border_color: Color, bg_color: Color) -> StyleBoxFlat:
 	var style = StyleBoxFlat.new()
@@ -227,24 +330,33 @@ func _make_tower_slot_style(border_color: Color, bg_color: Color) -> StyleBoxFla
 	style.set_content_margin_all(5)
 	return style
 
-var _slot_normal: StyleBoxFlat
-var _slot_hover: StyleBoxFlat
-var _slot_pressed: StyleBoxFlat
-var _slot_disabled: StyleBoxFlat
+var _slot_normal: StyleBox
+var _slot_hover: StyleBox
+var _slot_pressed: StyleBox
+var _slot_disabled: StyleBox
 
 func _init_tower_slot_styles():
-	# Normal — dark background, warm gold border
-	_slot_normal = _make_tower_slot_style(
-		Color(0.70, 0.55, 0.20), Color(0.12, 0.10, 0.08, 0.9))
-	# Hover — brighter gold, slightly lighter bg
-	_slot_hover = _make_tower_slot_style(
-		Color(1.0, 0.85, 0.30), Color(0.18, 0.15, 0.10, 0.95))
-	# Pressed — inset feel
-	_slot_pressed = _make_tower_slot_style(
-		Color(0.90, 0.70, 0.20), Color(0.08, 0.06, 0.04, 0.95))
-	# Disabled — dim
-	_slot_disabled = _make_tower_slot_style(
-		Color(0.35, 0.30, 0.15, 0.5), Color(0.08, 0.07, 0.06, 0.7))
+	# Texture-based tower slots (stone with blue-purple frame + gold corners)
+	var tex_normal = _load_tex(UI_TEX + "ui_tower_slot_bg.png")
+	var tex_selected = _load_tex(UI_TEX + "ui_tower_slot_selected.png")
+	
+	if tex_normal and tex_selected:
+		_slot_normal = _make_tex_style(tex_normal, 8, 8, 8, 8, 5, 5, 5, 5)
+		_slot_hover = _make_tex_style(tex_selected, 8, 8, 8, 8, 5, 5, 5, 5)
+		_slot_pressed = _make_tex_style(tex_selected, 8, 8, 8, 8, 5, 5, 5, 5)
+		_slot_pressed.modulate_color = Color(0.85, 0.80, 0.70)
+		_slot_disabled = _make_tex_style(tex_normal, 8, 8, 8, 8, 5, 5, 5, 5)
+		_slot_disabled.modulate_color = Color(0.4, 0.4, 0.4, 0.6)
+	else:
+		# Fallback flat styles
+		_slot_normal = _make_tower_slot_style(
+			Color(0.70, 0.55, 0.20), Color(0.12, 0.10, 0.08, 0.9))
+		_slot_hover = _make_tower_slot_style(
+			Color(1.0, 0.85, 0.30), Color(0.18, 0.15, 0.10, 0.95))
+		_slot_pressed = _make_tower_slot_style(
+			Color(0.90, 0.70, 0.20), Color(0.08, 0.06, 0.04, 0.95))
+		_slot_disabled = _make_tower_slot_style(
+			Color(0.35, 0.30, 0.15, 0.5), Color(0.08, 0.07, 0.06, 0.7))
 
 # === TOWER BUTTONS ===
 func _build_tower_buttons():
