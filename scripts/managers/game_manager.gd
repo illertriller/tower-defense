@@ -568,6 +568,7 @@ func _apply_gold_mine_income():
 			var gold = tower.get_gold_per_wave()
 			money += gold
 			total_gold_earned += gold
+			AudioManager.play_sfx("gold_pickup", -4.0)
 
 func complete_wave():
 	is_wave_active = false

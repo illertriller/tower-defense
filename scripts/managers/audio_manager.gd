@@ -312,6 +312,7 @@ func save_settings():
 		"master_volume": master_volume,
 		"sfx_volume": sfx_volume,
 		"music_volume": music_volume,
+		"muted": AudioServer.is_bus_mute(0),
 	}
 	var file = FileAccess.open(AUDIO_SETTINGS_PATH, FileAccess.WRITE)
 	if file:
@@ -331,3 +332,4 @@ func _load_settings():
 	master_volume = clampf(data.get("master_volume", 1.0), 0.0, 1.0)
 	sfx_volume = clampf(data.get("sfx_volume", 0.7), 0.0, 1.0)
 	music_volume = clampf(data.get("music_volume", 0.5), 0.0, 1.0)
+	AudioServer.set_bus_mute(0, data.get("muted", false))
