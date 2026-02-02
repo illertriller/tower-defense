@@ -168,8 +168,10 @@ func _place_tower(world_pos: Vector2):
 	if selected_tower.is_empty():
 		return
 	if not grid_manager.can_place_tower(world_pos):
+		AudioManager.play_sfx("error")
 		return
 	if not GameManager.buy_tower(selected_tower):
+		AudioManager.play_sfx("error")
 		return
 	
 	var snap_pos = grid_manager.get_tower_snap_position(world_pos)

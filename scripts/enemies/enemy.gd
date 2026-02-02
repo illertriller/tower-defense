@@ -269,8 +269,8 @@ func die():
 	GameManager.enemy_killed(reward)
 	AudioManager.play_sfx(_get_death_sound())
 	AudioManager.play_sfx("gold_pickup", -4.0)
-	# Spawn death effect and gold text
-	GameParticles.spawn_death_poof(get_tree(), global_position)
+	# Spawn type-specific death effect and gold text
+	GameParticles.spawn_death_effect(get_tree(), global_position, enemy_type)
 	GameParticles.spawn_gold_text(get_tree(), global_position, reward)
 	died.emit()
 	queue_free()

@@ -4,11 +4,70 @@ class_name GameParticles
 ## Static helper for spawning visual effects
 ## Call these from anywhere: GameParticles.spawn_*()
 
-# Spawn a death poof at a position
+# Spawn a death poof at a position (legacy — uses generic poof)
 static func spawn_death_poof(tree: SceneTree, pos: Vector2):
 	var poof = _create_animated_sprite(tree, pos, "death")
 	if poof:
 		poof.modulate = Color(1, 0.7, 0.5, 0.9)
+
+# Spawn type-specific death effect based on enemy category
+static func spawn_death_effect(tree: SceneTree, pos: Vector2, enemy_type: String):
+	var category = _get_death_category(enemy_type)
+	var sheet_path = "res://assets/sprites/effects/death_%s_sheet.png" % category
+	
+	# Fall back to generic poof if category sheet doesn't exist
+	if not ResourceLoader.exists(sheet_path):
+		spawn_death_poof(tree, pos)
+		return
+	
+	var tints = {
+		"fire": Color(1.0, 0.6, 0.3, 0.9),
+		"shadow": Color(0.6, 0.3, 0.8, 0.9),
+		"heavy": Color(0.8, 0.7, 0.5, 0.9),
+		"boss": Color(1.0, 0.3, 0.2, 1.0),
+	}
+	
+	var sprite = AnimatedSprite2D.new()
+	sprite.global_position = pos
+	sprite.z_index = 50
+	sprite.modulate = tints.get(category, Color(1, 0.7, 0.5, 0.9))
+	
+	# Boss death is bigger
+	if category == "boss":
+		sprite.scale = Vector2(1.5, 1.5)
+	
+	var frames = SpriteFrames.new()
+	frames.remove_animation("default")
+	frames.add_animation("death")
+	
+	var sheet = load(sheet_path)
+	var img = sheet.get_image()
+	var frame_count = img.get_width() / 64
+	for i in range(frame_count):
+		var frame_img = Image.create(64, 64, false, img.get_format())
+		frame_img.blit_rect(img, Rect2i(i * 64, 0, 64, 64), Vector2i(0, 0))
+		frames.add_frame("death", ImageTexture.create_from_image(frame_img))
+	
+	frames.set_animation_speed("death", 10.0)
+	frames.set_animation_loop("death", false)
+	sprite.sprite_frames = frames
+	sprite.play("death")
+	
+	tree.root.add_child(sprite)
+	sprite.animation_finished.connect(sprite.queue_free)
+
+static func _get_death_category(enemy_type: String) -> String:
+	match enemy_type:
+		"imp", "fire_elemental", "hell_hound":
+			return "fire"
+		"wraith", "shadow_stalker", "succubus":
+			return "shadow"
+		"brute_demon", "bone_golem", "hell_knight":
+			return "heavy"
+		"demon_lord":
+			return "boss"
+		_:
+			return "fire"  # default fallback
 
 # Spawn a gold pickup number floating up
 static func spawn_gold_text(tree: SceneTree, pos: Vector2, amount: int):
