@@ -6,7 +6,7 @@
 ---
 
 ## 1. 🔊 Sound Effects — Attacks, Impacts, UI, Ambient
-**Status:** 🟡 In progress (audio files gathered, integration underway)
+**Status:** ✅ DONE (2026-02-02)
 **Priority:** High — biggest impact on game feel
 
 ### What we have
@@ -101,7 +101,7 @@ gold_mine      → gold_pickup (on wave income)
 ---
 
 ## 2. 💰 Economy Balancing — Tower Costs, Enemy Rewards, Difficulty Curve
-**Status:** 🔜 Not started
+**Status:** ✅ DONE — First pass (2026-02-02). See BALANCE.md for full analysis.
 **Priority:** High — directly affects fun factor
 
 ### Current State
@@ -175,7 +175,7 @@ Need to verify/set kill rewards per enemy type:
 ---
 
 ## 3. ⚙️ Settings Menus — Volume Sliders + Graphics Options
-**Status:** 🔜 Not started
+**Status:** ✅ DONE (2026-02-02)
 **Priority:** Medium — needed for release, depends on AudioManager
 
 ### Current State
@@ -227,7 +227,7 @@ Settings menu should be reachable from:
 ---
 
 ## 4. 🔓 Level Lock Logic — Re-enable Progression
-**Status:** 🔜 Not started (code exists, just commented out)
+**Status:** ✅ DONE (2026-02-02)
 **Priority:** Medium — important for game flow
 
 ### Current State
@@ -317,8 +317,8 @@ const DEV_UNLOCK_ALL = false  # Set true for testing
 - **No external actions** (no publishing, no itch.io, no public posts) — internal work only
 
 ### Execution Order
-1. ✅ Level lock logic (DONE)
-2. Sound integration (in progress — verify/finish AudioManager + wiring)
-3. Settings menus (volume sliders, persistence)
-4. Economy balancing (document → balance → test mathematically)
-5. Final Vetinari audit against full PRD
+1. ✅ Level lock logic — DONE
+2. ✅ Sound integration — AudioManager + full wiring (44 files, all scripts updated)
+3. ✅ Settings menus — Volume sliders (master/music/SFX), mute toggle, persistence
+4. ✅ Economy balancing — Full analysis in BALANCE.md, targeted adjustments
+5. 🔜 Final Vetinari audit against full PRD (scheduled 02:00 UTC / 9 AM Bangkok)
