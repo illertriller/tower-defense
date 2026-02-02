@@ -122,6 +122,7 @@ func _generate_lightning_points(start: Vector2, end: Vector2) -> Array:
 func _zap():
 	can_zap = false
 	zap_timer.start()
+	AudioManager.play_sfx("spell", -3.0)
 	
 	for target in current_targets:
 		if is_instance_valid(target) and target.has_method("take_damage"):

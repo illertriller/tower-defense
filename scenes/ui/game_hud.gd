@@ -55,6 +55,11 @@ func _ready():
 	main_menu_btn.pressed.connect(_on_main_menu)
 	start_wave_btn.pressed.connect(func(): wave_start_requested.emit())
 	
+	# Button audio for ESC menu and controls
+	for btn in [resume_btn, restart_btn, settings_btn, main_menu_btn, start_wave_btn]:
+		btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
+	
 	_apply_ui_style()
 	_build_tower_buttons()
 	_clear_info_panel()
@@ -281,6 +286,8 @@ func _build_tower_buttons():
 		]
 		
 		btn.pressed.connect(func(): tower_selected.emit(type))
+		btn.pressed.connect(func(): AudioManager.play_sfx("select"))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
 		tower_grid.add_child(btn)
 
 # === HUD UPDATE ===
@@ -388,6 +395,7 @@ func _clear_info_panel():
 func toggle_esc_menu():
 	esc_menu.visible = not esc_menu.visible
 	get_tree().paused = esc_menu.visible
+	AudioManager.play_sfx("menu_open" if esc_menu.visible else "menu_close")
 
 func _on_resume():
 	esc_menu.visible = false

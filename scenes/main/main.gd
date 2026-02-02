@@ -79,6 +79,9 @@ func _ready():
 	minimap.setup(Vector2(map_width, map_height), path_points)
 	minimap.set_containers(enemy_path, $TowersContainer)
 	
+	# Play battle music (random between two tracks for variety)
+	AudioManager.play_music(["battle_loop", "battle_loop_alt"][randi() % 2])
+	
 	hud.update_hud()
 
 func _setup_level():
@@ -115,7 +118,8 @@ func _on_hud_tower_selected(type: String):
 
 func _on_hud_upgrade_requested(path: String):
 	if selected_placed_tower and selected_placed_tower.has_method("apply_upgrade"):
-		selected_placed_tower.apply_upgrade(path)
+		if selected_placed_tower.apply_upgrade(path):
+			AudioManager.play_sfx("tower_upgrade")
 		hud.update_hud()
 
 func _on_hud_demolish_requested():
@@ -123,6 +127,7 @@ func _on_hud_demolish_requested():
 		return
 	var refund = selected_placed_tower.get_total_value() / 2
 	GameManager.money += refund
+	AudioManager.play_sfx("tower_sell")
 	grid_manager.remove_tower(selected_placed_tower.global_position)
 	GameParticles.spawn_death_poof(get_tree(), selected_placed_tower.global_position)
 	selected_placed_tower.queue_free()
@@ -174,6 +179,7 @@ func _place_tower(world_pos: Vector2):
 	$TowersContainer.add_child(tower)
 	grid_manager.place_tower(world_pos)
 	GameParticles.spawn_build_poof(get_tree(), snap_pos)
+	AudioManager.play_sfx("tower_place")
 	
 	is_placing = false
 	selected_tower = ""
@@ -194,6 +200,7 @@ func _on_start_wave_pressed():
 	if GameManager.is_wave_active or GameManager.current_wave >= GameManager.total_waves:
 		return
 	GameManager.start_wave()
+	AudioManager.play_sfx("wave_start")
 	_spawn_wave()
 
 func _spawn_wave():

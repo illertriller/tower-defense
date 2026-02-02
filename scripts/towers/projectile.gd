@@ -60,6 +60,7 @@ func _apply_hit(enemy: Area2D):
 	
 	# Splash damage
 	if splash_radius > 0:
+		AudioManager.play_sfx("explosion_impact")
 		GameParticles.spawn_explosion(get_tree(), global_position, splash_radius)
 		var splash_enemies = _get_enemies_in_radius(splash_radius)
 		for e in splash_enemies:

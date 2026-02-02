@@ -18,6 +18,12 @@ func _ready():
 	settings_btn.disabled = false
 	_style_menu_buttons()
 	
+	# Audio: menu music + button sounds
+	AudioManager.play_music("menu_theme")
+	for btn in [start_btn, settings_btn, exit_btn]:
+		btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
+	
 	# Animate title fade in
 	title_label.modulate.a = 0.0
 	subtitle_label.modulate.a = 0.0

@@ -11,6 +11,17 @@ func _ready():
 	next_btn.pressed.connect(_on_next_pressed)
 	menu_btn.pressed.connect(_on_menu_pressed)
 	
+	# Button SFX
+	for btn in [next_btn, menu_btn]:
+		btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
+	
+	# Victory audio — stop battle music, play fanfare then victory theme
+	AudioManager.stop_music(0.5)
+	AudioManager.play_sfx("victory_fanfare")
+	# Delay the victory theme slightly so fanfare plays first
+	get_tree().create_timer(1.5).timeout.connect(func(): AudioManager.play_music("victory_theme", 0.5))
+	
 	_show_score()
 	
 	# Fade in

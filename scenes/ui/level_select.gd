@@ -7,9 +7,13 @@ extends Control
 
 func _ready():
 	back_btn.pressed.connect(_on_back_pressed)
-	# DEV: All levels unlocked for testing (restore lock logic later)
-	GameManager.max_level_unlocked = 5
-	#GameManager.max_level_unlocked = max(GameManager.max_level_unlocked, SaveManager.load_progress())
+	back_btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
+	back_btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
+	const DEV_UNLOCK_ALL = false  # Set true to unlock all levels for testing
+	if DEV_UNLOCK_ALL:
+		GameManager.max_level_unlocked = 5
+	else:
+		GameManager.max_level_unlocked = max(GameManager.max_level_unlocked, SaveManager.load_progress())
 	_create_level_buttons()
 
 func _create_level_buttons():
@@ -28,6 +32,8 @@ func _create_level_buttons():
 				btn.text += "\n★ %d" % best["score"]
 		
 		btn.pressed.connect(_on_level_pressed.bind(level))
+		btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
 		grid.add_child(btn)
 
 func _on_level_pressed(level: int):

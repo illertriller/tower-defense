@@ -11,6 +11,15 @@ func _ready():
 	retry_btn.pressed.connect(_on_retry_pressed)
 	menu_btn.pressed.connect(_on_menu_pressed)
 	
+	# Button SFX
+	for btn in [retry_btn, menu_btn]:
+		btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
+	
+	# Defeat audio — stop battle music, play defeat sound
+	AudioManager.stop_music(0.5)
+	AudioManager.play_sfx("defeat")
+	
 	_show_stats()
 	
 	# Fade in

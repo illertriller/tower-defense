@@ -155,6 +155,11 @@ func _shoot_projectile():
 	can_shoot = false
 	shoot_timer.start()
 	
+	# Play tower attack sound
+	var attack_sfx = AudioManager.get_tower_attack_sound(tower_type)
+	if not attack_sfx.is_empty():
+		AudioManager.play_sfx(attack_sfx)
+	
 	var projectile = projectile_scene.instantiate()
 	if barrel:
 		projectile.global_position = barrel.global_position
@@ -256,6 +261,7 @@ func _generate_lightning_points(start: Vector2, end: Vector2) -> Array:
 func _zap():
 	can_shoot = false
 	shoot_timer.start()
+	AudioManager.play_sfx("spell", -3.0)
 	var targets = _get_current_beam_targets()
 	for target in targets:
 		if is_instance_valid(target) and target.has_method("take_damage"):
@@ -266,6 +272,7 @@ func _zap():
 func _aoe_damage():
 	can_shoot = false
 	shoot_timer.start()
+	AudioManager.play_sfx("fire_attack", -3.0)
 	GameParticles.spawn_fire_burst(get_tree(), global_position)
 	var targets = _get_valid_targets()
 	for target in targets:

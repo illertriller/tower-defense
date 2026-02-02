@@ -233,6 +233,7 @@ func _process(delta: float):
 func take_damage(amount: int):
 	health -= amount
 	health_bar.value = health
+	AudioManager.play_sfx("enemy_hit", -6.0)
 	
 	# Flash white on hit
 	animated_sprite.modulate = Color(2, 2, 2, 1)
@@ -255,8 +256,19 @@ func apply_burn(damage: float, duration: float):
 	burn_damage = damage
 	burn_timer = duration
 
+func _get_death_sound() -> String:
+	match enemy_type:
+		"brute_demon", "bone_golem", "tank":
+			return "enemy_death_ogre"
+		"wraith", "shadow_stalker":
+			return "enemy_death_shade"
+		_:
+			return "enemy_death"
+
 func die():
 	GameManager.enemy_killed(reward)
+	AudioManager.play_sfx(_get_death_sound())
+	AudioManager.play_sfx("gold_pickup", -4.0)
 	# Spawn death effect and gold text
 	GameParticles.spawn_death_poof(get_tree(), global_position)
 	GameParticles.spawn_gold_text(get_tree(), global_position, reward)

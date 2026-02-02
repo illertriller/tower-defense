@@ -1,91 +1,62 @@
 # Tower Defense — Development Roadmap
-**Last updated:** 2026-01-30 (Phase 1 in progress)
+**Last updated:** 2026-02-02
+**Target release:** Feb 14, 2026 → itch.io
 
 ---
 
-## Phase 1: Core Game Loop ⏳
-**Target:** Tonight (2026-01-30)
-**Goal:** A complete, playable game with proper structure
+## ✅ Completed — Core Game (Jan 28–31)
 
-| Task | Owner | Status |
-|------|-------|--------|
-| Start menu (backdrop, start/settings/exit) | EDI | ✅ Done |
-| Start menu ember effects | EDI | ✅ Done |
-| Level select screen (5 levels) | EDI | ✅ Done |
-| Basic settings menu (placeholder) | EDI | ✅ Done (disabled) |
-| Map/terrain rework (layered grass + dirt road) | EDI | ✅ Done (prev session) |
-| 10 demon enemy types (sprites + static) | Leonard | ✅ 10/10 Done |
-| 10 demon enemy types (walk animations) | Leonard | ⏳ 7/10 Done |
-| 10 demon enemy types (stats + abilities) | EDI | ✅ Done |
-| 5 levels with unique path layouts | EDI | ✅ Done |
-| 10 waves per level, escalating difficulty | EDI | ✅ Done |
-| Win screen (score summary) | EDI | ✅ Done |
-| Lose screen (restart/main menu) | EDI | ✅ Done |
-| Keyboard shortcuts (1-4, Space, ESC) | EDI | ✅ Done |
-| Wave race condition fix | EDI | ✅ Done |
-| Testing & bug fixes | EDI | 🔜 Next |
+Everything below is done and playable:
 
-## Phase 2: Towers & Combat ⏳
-**Target:** 2026-01-31
-**Goal:** Full tower roster with unique mechanics
-
-| Task | Owner | Status |
-|------|-------|--------|
-| 10 new tower types (design + sprites) | Leonard | ⏳ 5/10 Done |
-| 3 new projectile sprites (frost/poison/holy) | Leonard | ⏳ Pending |
-| Tower mechanics (frost, flame, anti-air, etc.) | EDI | ✅ Done |
-| Flying enemy mechanic (wraith + anti-air) | EDI | ✅ Done |
-| Poison/burn DoT system | EDI | ✅ Done |
-| Splash damage system | EDI | ✅ Done |
-| Holy damage multiplier | EDI | ✅ Done |
-| Gold mine income mechanic | EDI | ✅ Done |
-| Tower upgrade system (3 paths, 3 levels each) | EDI | ✅ Done |
-| Tower upgrade UI panel | EDI | ✅ Done |
-| Universal tower script (handles all types) | EDI | ✅ Done |
-| Game economy balancing (costs, rewards) | EDI + Martin | 🔜 Needs testing |
-
-## Phase 3: UI Overhaul ⏳
-**Target:** 2026-01-31
-**Goal:** WC3-inspired professional game UI
-
-| Task | Owner | Status |
-|------|-------|--------|
-| Bottom panel UI (tower menu, info, controls) | EDI | ✅ Done |
-| WC3-style UI frame art | Leonard | ⏳ In progress |
-| In-game ESC menu (resume/settings/restart/quit) | EDI | ✅ Done |
-| Full settings menus (graphics/sound/keys) | EDI | 🔜 Phase 4 |
-| Tower selection & info panel | EDI | ✅ Done |
-| Level select screen | EDI | ✅ Done (Phase 1) |
-| Separated HUD scene (game_hud.tscn) | EDI | ✅ Done |
-
-## Phase 4: Polish & Juice ⏳
-**Target:** 2026-01-31
-**Goal:** Professional feel, replayability
-
-| Task | Owner | Status |
-|------|-------|--------|
-| Sound effects (attacks, deaths, UI clicks) | EDI | 🔜 Future |
-| Particle effects (explosions, magic, frost, build) | EDI | ✅ Done |
-| Credits roll animation | EDI | ✅ Done |
-| Highscore persistence (save/load) | EDI | ✅ Done |
-| 5 unique map visual themes | Leonard | ⏳ In progress |
-| Enemy death animations | Leonard | ⏳ In progress |
-| Tower placement/build animations | EDI | ✅ Done |
-| Level select highscore display | EDI | ✅ Done |
-| Terrain theme system (per-level textures) | EDI | ✅ Done |
-| Final balancing pass | EDI + Martin | 🔜 Needs testing |
+- **10 demon enemy types** — sprites, walk animations (7/10), stats, abilities
+- **10 tower types** — unique mechanics (frost, flame, poison, holy, splash, anti-air, gold mine, etc.)
+- **Tower upgrade system** — 3 paths, 3 levels each, universal tower script
+- **5 levels** — unique path layouts, 10 waves each, escalating difficulty
+- **Flying enemy mechanic** — wraith + anti-air tower
+- **DoT system** — poison/burn damage over time
+- **Splash damage system**
+- **Full UI** — start menu, level select, in-game HUD (WC3-inspired), ESC menu, win/lose screens
+- **Particle effects** — explosions, magic, frost, build animations
+- **Credits roll**, highscore persistence, keyboard shortcuts
+- **Terrain theme system** — per-level textures
+- **GameManager autoload**, LevelData class, separated HUD scene
 
 ---
 
-## Architecture Notes (Phase 1)
+## 🔧 Week 1: Polish (Feb 3–9)
+
+| # | Task | Owner | Status | Notes |
+|---|------|-------|--------|-------|
+| 1 | 🔊 Sound effects | EDI | 🔜 | Attacks, impacts, UI clicks, ambient, music |
+| 2 | 💰 Economy balancing | EDI + Martin | 🔜 | Tower costs, enemy rewards, difficulty curve |
+| 3 | ⚙️ Settings menus | EDI | 🔜 | Volume sliders, maybe graphics options |
+| 4 | 🔓 Level lock logic | EDI | 🔜 | Currently commented out — re-enable + test |
+| 5 | 🎨 Remaining walk animations | Leonard | 🔜 | 3/10 enemy types still need walk anims |
+| 6 | 🖼️ WC3 UI frame art | Leonard | ⏳ | In progress |
+| 7 | 💀 Enemy death animations | Leonard | ⏳ | In progress |
+
+## 🚀 Week 2: Release Prep (Feb 10–14)
+
+| # | Task | Owner | Status | Notes |
+|---|------|-------|--------|-------|
+| 8 | 🎨 Final visual polish pass | EDI + Leonard | 🔜 | |
+| 9 | ⚖️ Final balancing pass | EDI + Martin | 🔜 | Playtesting |
+| 10 | 🧪 Bug testing | EDI + Martin | 🔜 | Full playthrough all 5 levels |
+| 11 | 📦 Godot export (HTML5 + Windows) | EDI | 🔜 | |
+| 12 | 🌐 itch.io page setup | EDI + Martin | 🔜 | Screenshots, description, tags |
+| 13 | 🎉 Release! | All | 🔜 | Target: Feb 14 |
+
+---
+
+## Architecture Notes
 - **Start menu** → Level select → Gameplay → Win/Lose screens
 - **LevelData class** (scripts/data/level_data.gd) — all level paths + wave definitions
 - **GameManager autoload** — tracks level, wave, money, lives, scoring
 - **Enemy system** — 10 types with colored placeholders as fallback for missing sprites
 - **Path system** — curves set dynamically from LevelData, one generic level scene
-- **Scoring** — lives * 100 + kills * 10 + time bonus (faster = more points)
+- **Scoring** — lives × 100 + kills × 10 + time bonus (faster = more points)
 
-## Future Ideas (Post-MVP, to discuss with Martin)
+## Future Ideas (Post-Release)
 - Maul/maze mode (WC3 style — build your own path)
 - Multiplayer
 - Boss special abilities / phases
@@ -93,3 +64,4 @@
 - Tower synergies (combo bonuses for adjacent towers)
 - Endless/survival mode
 - Mobile export
+- More levels + enemy types
