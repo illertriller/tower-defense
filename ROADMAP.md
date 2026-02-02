@@ -27,24 +27,26 @@ Everything below is done and playable:
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 1 | 🔊 Sound effects | EDI | 🔜 | Attacks, impacts, UI clicks, ambient, music |
-| 2 | 💰 Economy balancing | EDI + Martin | 🔜 | Tower costs, enemy rewards, difficulty curve |
-| 3 | ⚙️ Settings menus | EDI | 🔜 | Volume sliders, maybe graphics options |
-| 4 | 🔓 Level lock logic | EDI | 🔜 | Currently commented out — re-enable + test |
-| 5 | 🎨 Remaining walk animations | Leonard | 🔜 | 3/10 enemy types still need walk anims |
-| 6 | 🖼️ WC3 UI frame art | Leonard | ⏳ | In progress |
-| 7 | 💀 Enemy death animations | Leonard | ⏳ | In progress |
+| 1 | 🔊 Sound effects | EDI | ✅ | AudioManager + 44 audio files wired |
+| 2 | 💰 Economy balancing | EDI + Martin | ✅ | First pass done, see BALANCE.md |
+| 3 | ⚙️ Settings menus | EDI | ✅ | Volume sliders + mute toggle |
+| 4 | 🔓 Level lock logic | EDI | ✅ | Re-enabled with dev toggle |
+| 5 | 🎨 Walk animation audit | Leonard | ⏳ | Auditing all 10 walk sheets |
+| 6 | 🖼️ UI art polish | EDI + Leonard | ⏳ | Auditing usage, polishing |
+| 7 | 💀 Enemy death animations | Leonard | ⏳ | 4 category sheets (fire/shadow/heavy/boss) |
 
 ## 🚀 Week 2: Release Prep (Feb 10–14)
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 8 | 🎨 Final visual polish pass | EDI + Leonard | 🔜 | |
-| 9 | ⚖️ Final balancing pass | EDI + Martin | 🔜 | Playtesting |
-| 10 | 🧪 Bug testing | EDI + Martin | 🔜 | Full playthrough all 5 levels |
-| 11 | 📦 Godot export (HTML5 + Windows) | EDI | 🔜 | |
-| 12 | 🌐 itch.io page setup | EDI + Martin | 🔜 | Screenshots, description, tags |
-| 13 | 🎉 Release! | All | 🔜 | Target: Feb 14 |
+| 8 | 🐛 Code review + bug fixes | EDI | ✅ | Error sounds, null checks, dead code |
+| 9 | 📝 itch.io page draft | EDI | ✅ | Description, tags, credits — see ITCHIO.md |
+| 10 | 🎨 Final visual polish pass | EDI + Leonard | 🔜 | |
+| 11 | ⚖️ Final balancing pass | EDI + Martin | 🔜 | Playtesting |
+| 12 | 🧪 Bug testing | EDI + Martin | 🔜 | Full playthrough all 5 levels |
+| 13 | 📦 Godot export (HTML5 + Windows) | Martin + EDI | 🔜 | Godot on Martin's machine |
+| 14 | 🌐 itch.io page setup | EDI + Martin | 🔜 | Screenshots, description, tags |
+| 15 | 🎉 Release! | All | 🔜 | Target: Feb 14 |
 
 ---
 
