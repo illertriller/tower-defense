@@ -33,8 +33,8 @@ var enemy_types: Dictionary = {
 	"wraith": {"health": 60, "speed": 90, "reward": 12, "flying": true},
 	"fire_elemental": {"health": 80, "speed": 70, "reward": 15},
 	"shadow_stalker": {"health": 50, "speed": 100, "reward": 12},
-	"bone_golem": {"health": 400, "speed": 25, "reward": 35},
-	"succubus": {"health": 70, "speed": 75, "reward": 20},
+	"bone_golem": {"health": 400, "speed": 25, "reward": 40},
+	"succubus": {"health": 70, "speed": 75, "reward": 18},
 	"hell_knight": {"health": 250, "speed": 50, "reward": 30},
 	"demon_lord": {"health": 1000, "speed": 30, "reward": 100},
 	# Legacy types (fallback to new equivalents)
