@@ -171,7 +171,7 @@ func _preload_music():
 		var path = _music_paths[track_name]
 		if ResourceLoader.exists(path):
 			var stream = load(path)
-			if stream is AudioStreamOGGVorbis:
+			if stream is AudioStreamOggVorbis:
 				stream.loop = true
 			_music[track_name] = stream
 		else:
