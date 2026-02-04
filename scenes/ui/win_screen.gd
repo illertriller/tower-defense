@@ -1,11 +1,15 @@
 extends Control
 
 ## Win Screen — shown when all waves are cleared
+## Plays win cinematic first, then shows score
 
 @onready var title_label: Label = $VBoxContainer/TitleLabel
 @onready var stats_label: Label = $VBoxContainer/StatsLabel
 @onready var next_btn: Button = $VBoxContainer/ButtonRow/NextLevelBtn
 @onready var menu_btn: Button = $VBoxContainer/ButtonRow/MenuBtn
+
+var cinematic_scene: PackedScene = preload("res://scenes/ui/cinematic_player.tscn")
+var _cinematic_instance: Control = null
 
 func _ready():
 	next_btn.pressed.connect(_on_next_pressed)
@@ -16,10 +20,33 @@ func _ready():
 		btn.pressed.connect(func(): AudioManager.play_sfx("button_click"))
 		btn.mouse_entered.connect(func(): AudioManager.play_sfx("button_hover", -8.0))
 	
-	# Victory audio — stop battle music, play fanfare then victory theme
+	# Stop battle music
 	AudioManager.stop_music(0.5)
+	
+	# Hide UI elements and play win cinematic first
+	$VBoxContainer.visible = false
+	$Background.visible = false
+	_play_win_cinematic()
+
+func _play_win_cinematic():
+	_cinematic_instance = cinematic_scene.instantiate()
+	add_child(_cinematic_instance)
+	_cinematic_instance.cinematic_finished.connect(_on_cinematic_finished)
+	
+	var win_stream = load("res://assets/cinematic/win_cinematic.ogv")
+	_cinematic_instance.play_cinematic(win_stream)
+
+func _on_cinematic_finished():
+	if _cinematic_instance:
+		_cinematic_instance.queue_free()
+		_cinematic_instance = null
+	
+	# Now show the score screen
+	$VBoxContainer.visible = true
+	$Background.visible = true
+	
+	# Victory audio — play fanfare then victory theme
 	AudioManager.play_sfx("victory_fanfare")
-	# Delay the victory theme slightly so fanfare plays first
 	get_tree().create_timer(1.5).timeout.connect(func(): AudioManager.play_music("victory_theme", 0.5))
 	
 	_show_score()
