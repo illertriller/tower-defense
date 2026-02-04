@@ -15,3 +15,7 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+# Cinematic working files (keep only .ogv finals)
+assets/cinematic/*.mp4
+assets/cinematic/*.jpg
+assets/cinematic/win_lose_working/
