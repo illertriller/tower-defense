@@ -67,7 +67,7 @@ var sprite_sheets: Dictionary = {
 var default_faces_right: Dictionary = {
 	"imp": true,
 	"hell_hound": false,
-	"brute_demon": false,
+	"brute_demon": true,
 	"wraith": true,
 	"fire_elemental": true,
 	"shadow_stalker": false,
