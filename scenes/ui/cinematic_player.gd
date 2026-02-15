@@ -31,6 +31,33 @@ func play_cinematic(stream: VideoStream, next_scene: String = ""):
 	_next_scene = next_scene
 	video_player.stream = stream
 	video_player.play()
+	# Fit video to screen maintaining aspect ratio (letterbox/pillarbox)
+	_fit_video_to_screen()
+
+func _fit_video_to_screen():
+	# Wait one frame for the video to start and report its size
+	await get_tree().process_frame
+	var video_w = video_player.get_video_texture().get_width() if video_player.get_video_texture() else 848
+	var video_h = video_player.get_video_texture().get_height() if video_player.get_video_texture() else 480
+	var screen_size = get_viewport_rect().size
+	var video_aspect = float(video_w) / float(video_h)
+	var screen_aspect = screen_size.x / screen_size.y
+	
+	var target_w: float
+	var target_h: float
+	if video_aspect > screen_aspect:
+		# Video is wider — fit to width, letterbox top/bottom
+		target_w = screen_size.x
+		target_h = screen_size.x / video_aspect
+	else:
+		# Video is taller — fit to height, pillarbox left/right
+		target_h = screen_size.y
+		target_w = screen_size.y * video_aspect
+	
+	video_player.offset_left = -target_w / 2.0
+	video_player.offset_right = target_w / 2.0
+	video_player.offset_top = -target_h / 2.0
+	video_player.offset_bottom = target_h / 2.0
 
 func _skip():
 	video_player.stop()
