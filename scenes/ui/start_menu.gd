@@ -73,6 +73,7 @@ func _play_intro_cinematic():
 	$TitleLabel.visible = false
 	$SubtitleLabel.visible = false
 	$VersionLabel.visible = false
+	$Embers.visible = false
 	
 	_cinematic_instance = cinematic_scene.instantiate()
 	add_child(_cinematic_instance)
@@ -91,6 +92,7 @@ func _on_intro_finished():
 	$TitleLabel.visible = true
 	$SubtitleLabel.visible = true
 	$VersionLabel.visible = true
+	$Embers.visible = true
 	
 	# Now start the menu music and animations
 	_setup_audio()
