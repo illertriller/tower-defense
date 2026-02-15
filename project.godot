@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Tower Defense"
-config/description="Pixel art tower defense game — Demons from Hell"
+config/name="Hell Marches"
+config/description="Pixel art tower defense game — Hell Marches"
 run/main_scene="res://scenes/ui/start_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.png"
